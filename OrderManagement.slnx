@@ -1,4 +1,14 @@
 <Solution>
-  <Folder Name="/src/" />
-  <Folder Name="/tests/" />
+  <Folder Name="/Itens de Solução/">
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/OrderManagement.API/OrderManagement.API.csproj" Id="d34db2de-6f96-4a85-a21a-74ee6e52d1ee" />
+    <Project Path="src/OrderManagement.Application/OrderManagement.Application.csproj" Id="98519308-e736-4d13-ad72-8a34b8cda505" />
+    <Project Path="src/OrderManagement.Domain/OrderManagement.Domain.csproj" Id="c3594bc6-c657-41a2-9555-0924fefa3efd" />
+    <Project Path="src/OrderManagement.Infrastructure/OrderManagement.Infrastructure.csproj" Id="d5d39692-f284-454d-9740-3c3bf718b06c" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/OrderManagement.UnitTests/OrderManagement.UnitTests.csproj" Id="72d1f9d5-6500-4358-9c6e-7ce618f29111" />
+  </Folder>
 </Solution>
