@@ -15,10 +15,11 @@ O projeto segue uma arquitetura em camadas:
 O domínio foi modelado utilizando entidades ricas, onde as regras de negócio estão encapsuladas nas próprias entidades, evitando anemização do modelo.
 
 Principais decisões:
-- Uso de enums para estados (CustomerStatus, ProductStatus, OrderStatus)
-- Controle de estoque dentro da entidade Product
+- Uso de enums para estados (CustomerStatus, OrderStatus, ProductStatus)
 - Controle de fluxo de pedido via transições explícitas
+- Histórico de alterações de status em OrderHistory
 - Cálculo de total realizado dentro da entidade Order
+- Controle de estoque dentro da entidade Product
 
 ## Time & Money Strategy
 

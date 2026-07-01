@@ -81,9 +81,9 @@ Os testes automatizados serão implementados utilizando **xUnit**, priorizando a
 
 ### Domínio
 
-- [ ] Modelagem das entidades
-- [ ] Implementação das regras de negócio
-- [ ] Implementação do fluxo de status dos pedidos
+- [x] Modelagem das entidades
+- [x] Implementação das regras de negócio
+- [x] Implementação do fluxo de status dos pedidos
 
 ### Persistência
 
