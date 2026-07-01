@@ -1,6 +1,8 @@
 <Solution>
   <Folder Name="/Itens de Solução/">
+    <File Path="notes.txt" />
     <File Path="README.md" />
+    <File Path="technical-decisions.md" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/OrderManagement.API/OrderManagement.API.csproj" Id="d34db2de-6f96-4a85-a21a-74ee6e52d1ee" />

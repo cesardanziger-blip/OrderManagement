@@ -11,17 +11,19 @@ namespace OrderManagement.Domain.Entities
         public OrderStatus Status { get; private set; }
         private readonly List<OrderItem> _items = [];
         public IReadOnlyCollection<OrderItem> Items => _items.AsReadOnly();
+        private readonly List<OrderHistory> _history = [];
+
+        public IReadOnlyCollection<OrderHistory> History => _history.AsReadOnly();
 
         private Order() { }
-
-        public Order(Guid customerId)
+        public Order(Guid customerId, string? reason = null)
         {
             Id = Guid.NewGuid();
             CustomerId = customerId;
             CreatedAt = DateTime.UtcNow;
             Status = OrderStatus.Created;
+            _history.Add(new OrderHistory(Id, OrderStatus.Created, OrderStatus.Created, reason));
         }
-
         public void AddItem(Product product, int quantity)
         {
             if (Status != OrderStatus.Created)
@@ -33,40 +35,37 @@ namespace OrderManagement.Domain.Entities
 
             RecalculateTotal();
         }
-
         private void RecalculateTotal()
         {
             Total = _items.Sum(i => i.Total);
         }
-
-        private void SetStatus(OrderStatus newStatus)
+        private void SetStatus(OrderStatus newStatus, string? reason)
         {
             var previousStatus = Status;
             Status = newStatus;
+            _history.Add(new OrderHistory(Id, previousStatus, newStatus, reason));
         }
 
-        public void MarkAsPaid()
+        public void MarkAsPaid(string? reason = null)
         {
             if (Status != OrderStatus.Created)
                 throw new InvalidOperationException("Only created orders can be paid.");
 
-            SetStatus(OrderStatus.Paid);
+            SetStatus(OrderStatus.Paid, reason);
         }
-
-        public void MarkAsShipped()
+        public void MarkAsShipped(string? reason = null)
         {
             if (Status != OrderStatus.Paid)
                 throw new InvalidOperationException("Only paid orders can be shipped.");
 
-            SetStatus(OrderStatus.Shipped);
+            SetStatus(OrderStatus.Shipped, reason);
         }
-
-        public void MarkAsCancelled()
+        public void MarkAsCancelled(string? reason = null)
         {
             if (Status != OrderStatus.Created)
                 throw new InvalidOperationException("Only created orders can be cancelled.");
 
-            SetStatus(OrderStatus.Cancelled);
+            SetStatus(OrderStatus.Cancelled, reason);
         }
     }
 }
