@@ -16,14 +16,7 @@ namespace OrderManagement.Domain.Entities
 
         public Customer(string name, string email, string document)
         {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Name cannot be empty.", nameof(name));
-
-            if (string.IsNullOrWhiteSpace(email))
-                throw new ArgumentException("Email cannot be empty.", nameof(email));
-
-            if (string.IsNullOrWhiteSpace(document))
-                throw new ArgumentException("Document cannot be empty.", nameof(document));
+            Validate(name, email, document);
 
             Id = Guid.NewGuid();
             Name = name;
@@ -33,14 +26,30 @@ namespace OrderManagement.Domain.Entities
             CreatedAt = DateTime.UtcNow;
         }
 
+        private static void Validate(string name, string email, string document)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Name cannot be empty.", nameof(name));
+
+            if (string.IsNullOrWhiteSpace(email))
+                throw new ArgumentException("Email cannot be empty.", nameof(email));
+
+            if (string.IsNullOrWhiteSpace(document))
+                throw new ArgumentException("Document cannot be empty.", nameof(document));
+        }
+
         public void Deactivate()
         {
             Status = CustomerStatus.Inactive;
-            UpdatedAt = DateTime.UtcNow;
+            Touch();
         }
         public void Activate()
         {
             Status = CustomerStatus.Active;
+            Touch();
+        }
+        private void Touch()
+        {
             UpdatedAt = DateTime.UtcNow;
         }
     }
