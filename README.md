@@ -76,12 +76,12 @@ Os testes automatizados serão implementados utilizando **xUnit**, priorizando a
 ### Estrutura inicial
 
 - [x] Estrutura da solução
-- [ ] Configuração da arquitetura
+- [x] Configuração da arquitetura
 - [ ] Configuração do Entity Framework Core
 
 ### Domínio
 
-- [ ] Modelagem das entidades
+- [x] Modelagem das entidades
 - [ ] Implementação das regras de negócio
 - [ ] Implementação do fluxo de status dos pedidos
 
