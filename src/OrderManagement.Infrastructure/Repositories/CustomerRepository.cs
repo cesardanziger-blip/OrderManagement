@@ -29,9 +29,20 @@ namespace OrderManagement.Infrastructure.Repositories
         {
             return await _context.Customers.FirstOrDefaultAsync(x => x.Id == id);
         }
+
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
+        }
+
+        public Task<bool> EmailExistsAsync(string email)
+        {
+            return _context.Customers.AnyAsync(x => x.Email == email);
+        }
+
+        public Task<bool> DocumentExistsAsync(string document)
+        {
+            return _context.Customers.AnyAsync(x => x.Document == document);
         }
     }
 }
