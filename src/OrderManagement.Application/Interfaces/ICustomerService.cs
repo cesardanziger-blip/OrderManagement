@@ -7,7 +7,7 @@ namespace OrderManagement.Application.Interfaces
     {
         Task<CustomerResponse> CreateAsync(CreateCustomerRequest customer);
         Task<List<CustomerResponse>> GetAllAsync();
-        Task<CustomerResponse?> GetByIdAsync(Guid id);
+        Task<CustomerResponse> GetByIdAsync(Guid id);
 
         Task UpdateStatusAsync(Guid id, UpdateCustomerStatusRequest request);
     }

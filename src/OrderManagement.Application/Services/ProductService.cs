@@ -10,16 +10,20 @@ namespace OrderManagement.Application.Services
     public class ProductService : IProductService
     {
         private readonly IProductRepository _productRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ProductService(IProductRepository productRepository)
+        public ProductService(IProductRepository productRepository, IUnitOfWork unitOfWork)
         {
             _productRepository = productRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<ProductResponse> CreateAsync(CreateProductRequest request)
         {
             var product = request.ToDomain();
+
             await _productRepository.CreateAsync(product);
+            await _unitOfWork.SaveChangesAsync();
 
             return product.ToResponse();
         }
@@ -31,12 +35,12 @@ namespace OrderManagement.Application.Services
             return products.Select(c => c.ToResponse()).ToList();
         }
 
-        public async Task<ProductResponse?> GetByIdAsync(Guid id)
+        public async Task<ProductResponse> GetByIdAsync(Guid id)
         {
             var product = await _productRepository.GetByIdAsync(id)
                 ?? throw new ProductNotFoundException(id);
 
-            return product?.ToResponse();
+            return product.ToResponse();
         }
 
         public async Task UpdateAsync(Guid id, UpdateProductRequest request)
@@ -47,7 +51,7 @@ namespace OrderManagement.Application.Services
             product.UpdateDetails(request.Name, request.Description);
             product.UpdatePrice(request.Price);
 
-            await _productRepository.UpdateAsync(product);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task UpdateStatusAsync(Guid id, UpdateProductStatusRequest request)
@@ -60,7 +64,7 @@ namespace OrderManagement.Application.Services
             else
                 product.Deactivate();
 
-            await _productRepository.UpdateAsync(product);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task SetStockAsync(Guid id, SetProductStockRequest request)
@@ -70,7 +74,7 @@ namespace OrderManagement.Application.Services
 
             product.SetStock(request.Quantity);
 
-            await _productRepository.UpdateAsync(product);
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 }

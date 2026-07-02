@@ -7,7 +7,5 @@ namespace OrderManagement.Domain.Interfaces
         Task CreateAsync(Product product);
         Task<List<Product>> GetAllAsync();
         Task<Product?> GetByIdAsync(Guid id);
-        Task SaveChangesAsync();
-        Task UpdateAsync(Product product);
     }
 }

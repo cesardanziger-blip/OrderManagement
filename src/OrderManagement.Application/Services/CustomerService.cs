@@ -10,10 +10,12 @@ namespace OrderManagement.Application.Services
     public class CustomerService : ICustomerService
     {
         private readonly ICustomerRepository _customerRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CustomerService(ICustomerRepository customerRepository)
+        public CustomerService(ICustomerRepository customerRepository, IUnitOfWork unitOfWork)
         {
             _customerRepository = customerRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<CustomerResponse> CreateAsync(CreateCustomerRequest request)
@@ -27,6 +29,7 @@ namespace OrderManagement.Application.Services
 
             var customer = request.ToDomain();
             await _customerRepository.CreateAsync(customer);
+            await _unitOfWork.SaveChangesAsync();
 
             return customer.ToResponse();
         }
@@ -38,7 +41,7 @@ namespace OrderManagement.Application.Services
             return customers.Select(c => c.ToResponse()).ToList();
         }
 
-        public async Task<CustomerResponse?> GetByIdAsync(Guid id)
+        public async Task<CustomerResponse> GetByIdAsync(Guid id)
         {
             var customer = await _customerRepository.GetByIdAsync(id)
                 ?? throw new CustomerNotFoundException(id);
@@ -56,7 +59,7 @@ namespace OrderManagement.Application.Services
             else
                 customer.Deactivate();
 
-            await _customerRepository.UpdateAsync(customer);
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 }

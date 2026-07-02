@@ -6,7 +6,7 @@ namespace OrderManagement.Application.Interfaces
     public interface IOrderService
     {
         Task<Guid> CreateAsync(CreateOrderRequest request);
-        Task<OrderResponse?> GetByIdAsync(Guid id);
+        Task<OrderResponse> GetByIdAsync(Guid id);
         Task<List<OrderResponse>> GetAllAsync();
         Task UpdateStatusAsync(Guid id, UpdateOrderStatusRequest request);
     }

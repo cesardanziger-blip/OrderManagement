@@ -1,6 +1,6 @@
 # OrderManagement API - TECHNICAL DECISIONS
 
-## Architecture
+## Arquitetura
 
 O projeto segue uma arquitetura em camadas:
 
@@ -10,7 +10,7 @@ O projeto segue uma arquitetura em camadas:
 - API: exposição dos endpoints
 - Testes: testes unitários e de integração
 
-## Domain Design
+## Domínio
 
 O domínio foi modelado utilizando entidades ricas, onde as regras de negócio estão encapsuladas nas próprias entidades, evitando anemização do modelo.
 
@@ -20,8 +20,11 @@ Principais decisões:
 - Histórico de alterações de status em OrderHistory
 - Cálculo de total realizado dentro da entidade Order
 - Controle de estoque dentro da entidade Product
+- Stock é valor absoluto
+- SetStock substitui UpdateStock
+- OrderService usa transaction para não debitar ou aumentar o stock sem o pedido houver sido concluido
 
-## Time & Money Strategy
+## Estratégia Data e Dinheiro
 ### Datas
 
 - Todos os timestamps são persistidos em UTC utilizando `DateTime.UtcNow`.
@@ -33,15 +36,26 @@ Principais decisões:
 - Valores monetários são representados utilizando o tipo `decimal`, evitando perda de precisão inerente aos tipos de ponto flutuante.
 - Todos os cálculos de totais dos pedidos são realizados pela aplicação, garantindo consistência entre os itens e o valor final do pedido.
 
-## Persistence Strategy (EF Core)
+## Estratégia de persistência (EF Core)
 
-O projeto utiliza Entity Framework Core com Fluent API para configuração das entidades, separando o mapeamento da camada de domínio.
+O projeto adota uma estratégia de persistência baseada no padrão Repository + Unit of Work, utilizando o mecanismo de rastreamento de alterações (Change Tracking) do Entity Framework Core.
 
 Decisões principais:
 - Configurações isoladas por entidade utilizando `IEntityTypeConfiguration<T>`
 - Uso de `HasConversion<int>()` para persistência de enums como inteiros, reduzindo o espaço de armazenamento e desacoplando a representação do banco da forma como os dados são expostos pela API.
 - Definição de índices únicos para Email e Document, considerando apenas registros ativos
 - Os enums são serializados como texto nas respostas da API utilizando `JsonStringEnumConverter`, mantendo a persistência otimizada e tornando o contrato da API mais legível.
+
+## Fluxo de persistência
+Durante a criação de um pedido, a aplicação executa o seguinte fluxo:
+
+Validação do cliente.
+Validação dos produtos.
+Atualização do estoque em memória.
+Criação da entidade Order.
+Persistência de todas as alterações através de uma única chamada ao UnitOfWork.
+
+Essa abordagem garante que todas as alterações sejam persistidas em uma única operação, reduzindo o risco de inconsistências caso ocorra alguma falha durante o processamento do pedido.
 
 ## Decisões arquiteturais
 
@@ -52,8 +66,12 @@ Decisões principais:
 - Infrastructure é responsável exclusivamente por persistência
 - API não acessa Domain diretamente, apenas Application Layer
 - Conversões de entidades para contratos foram centralizadas em extension methods, incluindo formatação de enums e conversão de datas para o fuso horário da aplicação.
+- Os repositórios são responsáveis apenas por consultas e manipulação das entidades, não realizando persistência das alterações.
+- O método SaveChangesAsync() foi centralizado na abstração IUnitOfWork, tornando a camada de aplicação responsável por definir o momento do commit da operação.
+- Como todas as entidades são carregadas pelo mesmo DbContext durante a requisição, o Entity Framework Core rastreia automaticamente as alterações realizadas nas entidades, dispensando chamadas explícitas de Update() para objetos já carregados pelo contexto.
+- A criação de pedidos e as alterações de estoque passaram a ser persistidas através de uma única operação de SaveChangesAsync(), evitando estados parcialmente persistidos.
 
-## Validation strategy
+## Estratégia de validação
 
 O projeto utiliza FluentValidation na Application Layer para validação das entradas da API.
 
@@ -72,7 +90,7 @@ Padronização de erros de entrada
 Maior clareza e separação de responsabilidades
 Facilidade de manutenção e evolução das regras
 
-## API Documentation (Swagger/OpenAPI)
+## API Documentação (Swagger/OpenAPI)
 
 O projeto utiliza Swagger/OpenAPI para documentação interativa da API.
 
@@ -88,7 +106,7 @@ Benefícios:
 - Melhora a clareza dos contratos
 - Permite validação visual das respostas HTTP
 
-## Customer Status Management
+## Customer Status Gerenciamento
 
 O gerenciamento de status do cliente é realizado através de regras encapsuladas na própria entidade `Customer`, seguindo o conceito de entidade rica.
 
@@ -113,7 +131,7 @@ Benefícios:
 - Facilita testes unitários da lógica de estado
 - Reduz dependência de lógica de validação na camada de aplicação
 
-## Order Status Management
+## Order Status Gerenciamento
 
 O gerenciamento de status de pedidos é realizado através de um único endpoint:
 
@@ -134,7 +152,7 @@ Benefícios:
 - Centraliza regras de transição de estado no domínio
 - Facilita manutenção e evolução do fluxo de pedidos
 
-## Order History Strategy
+## Estratégia histórico de pedido
 
 O sistema mantém um histórico completo das alterações de status dos pedidos através da entidade OrderHistory.
 
@@ -153,3 +171,5 @@ Benefícios:
 - Consistência na auditoria de estados
 - Facilidade de debugging e análise de fluxo
 
+## Controle de estoque
+O controle de estoque foi ajustado para tratar o valor informado como o estoque atual do produto, e não como uma variação incremental.

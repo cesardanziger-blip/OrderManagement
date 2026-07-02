@@ -16,52 +16,54 @@ namespace OrderManagement.Application.Services
         private readonly IOrderRepository _orderRepository;
         private readonly IProductRepository _productRepository;
         private readonly ICustomerRepository _customerRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
         public OrderService(IOrderRepository orderRepository,
             IProductRepository productRepository,
-            ICustomerRepository customerRepository)
+            ICustomerRepository customerRepository,
+            IUnitOfWork unitOfWork)
         {
             _orderRepository = orderRepository;
             _productRepository = productRepository;
             _customerRepository = customerRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<Guid> CreateAsync(CreateOrderRequest request)
         {
             var customerId = request.CustomerId;
+
             var customer = await _customerRepository.GetByIdAsync(customerId)
                 ?? throw new CustomerNotFoundException(customerId);
 
             if (customer.Status != CustomerStatus.Active)
                 throw new InactiveCustomerException(customerId);
 
-            var order =  new Order(customerId);
+            var order = new Order(customerId);
 
             foreach (var item in request.Items)
             {
-                var productId = item.ProductId;
-                var product = await _productRepository.GetByIdAsync(productId)
-                     ?? throw new ProductNotFoundException(productId);
+                var product = await _productRepository.GetByIdAsync(item.ProductId)
+                    ?? throw new ProductNotFoundException(item.ProductId);
 
                 if (product.Status != ProductStatus.Active)
-                    throw new InactiveProductException(productId);
+                    throw new InactiveProductException(item.ProductId);
 
                 product.DecreaseStock(item.Quantity);
 
                 order.AddItem(product, item.Quantity);
-
-                await _productRepository.UpdateAsync(product);
             }
 
             await _orderRepository.CreateAsync(order);
+            await _unitOfWork.SaveChangesAsync();
 
             return order.Id;
         }
 
-        public async Task<OrderResponse?> GetByIdAsync(Guid id)
+        public async Task<OrderResponse> GetByIdAsync(Guid id)
         {
             var order = await _orderRepository.GetByIdAsync(id);
-            return order?.ToResponse();
+            return order.ToResponse();
         }
 
         public async Task<List<OrderResponse>> GetAllAsync()
@@ -95,8 +97,6 @@ namespace OrderManagement.Application.Services
                              ?? throw new ProductNotFoundException(item.ProductId);
 
                         product.IncreaseStock(item.Quantity);
-
-                        await _productRepository.UpdateAsync(product);
                     }
 
                     break;
@@ -105,7 +105,7 @@ namespace OrderManagement.Application.Services
                     throw new InvalidOrderStatusTransitionException();
             }
 
-            await _orderRepository.UpdateAsync(order);
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 }

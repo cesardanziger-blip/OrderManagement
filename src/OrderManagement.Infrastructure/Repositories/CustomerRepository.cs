@@ -16,8 +16,7 @@ namespace OrderManagement.Infrastructure.Repositories
 
         public async Task CreateAsync(Customer customer)
         {
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            await _context.Customers.AddAsync(customer);
         }
 
         public async Task<List<Customer>> GetAllAsync()
@@ -30,11 +29,6 @@ namespace OrderManagement.Infrastructure.Repositories
             return await _context.Customers.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task SaveChangesAsync()
-        {
-            await _context.SaveChangesAsync();
-        }
-
         public Task<bool> EmailExistsAsync(string email)
         {
             return _context.Customers.AnyAsync(x => x.Email == email);
@@ -43,12 +37,6 @@ namespace OrderManagement.Infrastructure.Repositories
         public Task<bool> DocumentExistsAsync(string document)
         {
             return _context.Customers.AnyAsync(x => x.Document == document);
-        }
-
-        public async Task UpdateAsync(Customer customer)
-        {
-            _context.Customers.Update(customer);
-            await _context.SaveChangesAsync();
         }
     }
 }

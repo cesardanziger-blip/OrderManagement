@@ -16,8 +16,7 @@ namespace OrderManagement.Infrastructure.Repositories
 
         public async Task CreateAsync(Order order)
         {
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
+            await _context.Orders.AddAsync(order);
         }
 
         public async Task<List<Order>> GetAllAsync()
@@ -28,11 +27,6 @@ namespace OrderManagement.Infrastructure.Repositories
         public async Task<Order?> GetByIdAsync(Guid id)
         {
             return await _context.Orders.FirstOrDefaultAsync(x => x.Id == id);
-        }
-
-        public async Task UpdateAsync(Order order)
-        {
-            await _context.SaveChangesAsync();
         }
     }
 }

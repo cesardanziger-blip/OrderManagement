@@ -7,6 +7,7 @@ using OrderManagement.Application.Services;
 using OrderManagement.Application.Validators.Customer;
 using OrderManagement.Domain.Interfaces;
 using OrderManagement.Infrastructure.Context;
+using OrderManagement.Infrastructure.Persistence;
 using OrderManagement.Infrastructure.Repositories;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -15,6 +16,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 //Configure CORS
 builder.Services.AddCors(options =>
