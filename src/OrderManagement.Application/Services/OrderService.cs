@@ -1,5 +1,8 @@
 ﻿using OrderManagement.Application.Contracts.Requests;
 using OrderManagement.Application.Contracts.Responses;
+using OrderManagement.Application.Exceptions.Customer;
+using OrderManagement.Application.Exceptions.Order;
+using OrderManagement.Application.Exceptions.Product;
 using OrderManagement.Application.Interfaces;
 using OrderManagement.Application.Mappings;
 using OrderManagement.Domain.Entities;
@@ -25,21 +28,23 @@ namespace OrderManagement.Application.Services
 
         public async Task<Guid> CreateAsync(CreateOrderRequest request)
         {
-            var customer = await _customerRepository.GetByIdAsync(request.CustomerId)
-                ?? throw new Exception("Customer not found.");
+            var customerId = request.CustomerId;
+            var customer = await _customerRepository.GetByIdAsync(customerId)
+                ?? throw new CustomerNotFoundException(customerId);
 
             if (customer.Status != CustomerStatus.Active)
-                throw new Exception("Inactive customer cannot create orders.");
+                throw new InactiveCustomerException(customerId);
 
-            var order =  new Order(request.CustomerId);
+            var order =  new Order(customerId);
 
             foreach (var item in request.Items)
             {
-                var product = await _productRepository.GetByIdAsync(item.ProductId)
-                    ?? throw new Exception("Product not found.");
+                var productId = item.ProductId;
+                var product = await _productRepository.GetByIdAsync(productId)
+                     ?? throw new ProductNotFoundException(productId);
 
                 if (product.Status != ProductStatus.Active)
-                    throw new Exception("Inactive product cannot be used.");
+                    throw new InactiveProductException(productId);
 
                 product.DecreaseStock(item.Quantity);
 
@@ -66,47 +71,10 @@ namespace OrderManagement.Application.Services
             return orders.Select(c => c.ToResponse()).ToList();
         }
 
-        public async Task PayAsync(Guid id)
-        {
-            var order = await _orderRepository.GetByIdAsync(id)
-                ?? throw new Exception("Order not found.");
-
-            order.MarkAsPaid();
-
-            await _orderRepository.UpdateAsync(order);
-        }
-
-        public async Task ShipAsync(Guid id)
-        {
-            var order = await _orderRepository.GetByIdAsync(id)
-                ?? throw new Exception("Order not found.");
-
-            order.MarkAsShipped();
-
-            await _orderRepository.UpdateAsync(order);
-        }
-
-        public async Task CancelAsync(Guid id)
-        {
-            var order = await _orderRepository.GetByIdAsync(id)
-                ?? throw new Exception("Order not found.");
-
-            order.MarkAsCancelled();
-
-            foreach (var item in order.Items)
-            {
-                var product = await _productRepository.GetByIdAsync(item.ProductId);
-                product?.IncreaseStock(item.Quantity);
-                await _productRepository.UpdateAsync(product!);
-            }
-
-            await _orderRepository.UpdateAsync(order);
-        }
-
         public async Task UpdateStatusAsync(Guid id, UpdateOrderStatusRequest request)
         {
             var order = await _orderRepository.GetByIdAsync(id)
-                ?? throw new Exception("Order not found.");
+                ?? throw new OrderNotFoundException(id);
 
             switch (request.Status)
             {
@@ -124,7 +92,7 @@ namespace OrderManagement.Application.Services
                     foreach (var item in order.Items)
                     {
                         var product = await _productRepository.GetByIdAsync(item.ProductId)
-                            ?? throw new Exception("Product not found.");
+                             ?? throw new ProductNotFoundException(item.ProductId);
 
                         product.IncreaseStock(item.Quantity);
 
@@ -134,7 +102,7 @@ namespace OrderManagement.Application.Services
                     break;
 
                 default:
-                    throw new InvalidOperationException("Invalid status transition.");
+                    throw new InvalidOrderStatusTransitionException();
             }
 
             await _orderRepository.UpdateAsync(order);

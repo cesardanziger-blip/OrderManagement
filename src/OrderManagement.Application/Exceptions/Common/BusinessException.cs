@@ -1,4 +1,4 @@
-﻿namespace OrderManagement.Application.Exceptions;
+﻿namespace OrderManagement.Application.Exceptions.Common;
 
 public class BusinessException : Exception
 {

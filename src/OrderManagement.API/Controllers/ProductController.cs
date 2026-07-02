@@ -57,13 +57,13 @@ namespace OrderManagement.API.Controllers
         }
 
         /// <summary>
-        /// Updates a product.
+        /// Updates an existing product.
         /// </summary>
         [HttpPut("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateProductRequest request)
         {
-            await _productService.UpdateAsync(request);
+            await _productService.UpdateAsync(id, request);
 
             return NoContent();
         }
@@ -73,21 +73,22 @@ namespace OrderManagement.API.Controllers
         /// </summary>
         [HttpPatch("{id:guid}/status")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> UpdateStatus([FromBody] UpdateProductStatusRequest request)
+        public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] UpdateProductStatusRequest request)
         {
-            await _productService.UpdateStatusAsync(request);
+            await _productService.UpdateStatusAsync(id, request);
 
             return NoContent();
         }
 
         /// <summary>
-        /// Updates product stock.
+        /// Sets the current stock to the specified value.
+        /// The provided quantity represents the absolute stock value, not a delta.
         /// </summary>
         [HttpPatch("{id:guid}/stock")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> UpdateStock([FromBody] UpdateProductStockRequest request)
+        public async Task<IActionResult> SetStock(Guid id, [FromBody] SetProductStockRequest request)
         {
-            await _productService.UpdateStockAsync(request);
+            await _productService.SetStockAsync(id, request);
 
             return NoContent();
         }

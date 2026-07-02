@@ -1,4 +1,6 @@
-﻿namespace OrderManagement.Application.Exceptions
+﻿using OrderManagement.Application.Exceptions.Common;
+
+namespace OrderManagement.Application.Exceptions.Customer
 {
     public sealed class CustomerNotFoundException : NotFoundException
     {

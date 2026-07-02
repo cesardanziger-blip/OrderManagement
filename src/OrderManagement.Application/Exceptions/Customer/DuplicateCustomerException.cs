@@ -1,4 +1,4 @@
-﻿using OrderManagement.Application.Exceptions;
+﻿using OrderManagement.Application.Exceptions.Common;
 
 public class DuplicateCustomerException : BusinessException
 {

@@ -1,6 +1,6 @@
 ﻿using OrderManagement.Application.Contracts.Requests;
 using OrderManagement.Application.Contracts.Responses;
-using OrderManagement.Application.Exceptions;
+using OrderManagement.Application.Exceptions.Customer;
 using OrderManagement.Application.Interfaces;
 using OrderManagement.Application.Mappings;
 using OrderManagement.Domain.Interfaces;

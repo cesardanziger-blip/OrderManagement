@@ -37,11 +37,17 @@ namespace OrderManagement.Domain.Entities
 
         public void Deactivate()
         {
+            if (Status == ProductStatus.Inactive)
+                throw new InvalidOperationException("Product is already inactive.");
+
             Status = ProductStatus.Inactive;
             Touch();
         }
         public void Activate()
         {
+            if (Status == ProductStatus.Active)
+                throw new InvalidOperationException("Product is already active.");
+
             Status = ProductStatus.Active;
             Touch();
         }
@@ -73,13 +79,16 @@ namespace OrderManagement.Domain.Entities
             Touch();
         }
 
-        public void UpdateStock(int quantity)
+        public void SetStock(int quantity)
         {
             if (Status != ProductStatus.Active)
                 throw new InvalidOperationException("Inactive product cannot have its stock changed.");
 
             if (quantity < 0)
                 throw new ArgumentException("Stock cannot be negative.", nameof(quantity));
+
+            if (quantity == Stock)
+                return;
 
             Stock = quantity;
             Touch();

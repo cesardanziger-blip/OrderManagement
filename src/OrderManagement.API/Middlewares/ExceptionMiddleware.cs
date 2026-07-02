@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using OrderManagement.Application.Exceptions;
+using OrderManagement.Application.Exceptions.Common;
 
 namespace OrderManagement.API.Middlewares;
 

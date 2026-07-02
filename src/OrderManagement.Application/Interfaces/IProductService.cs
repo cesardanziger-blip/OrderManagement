@@ -9,8 +9,8 @@ namespace OrderManagement.Application.Interfaces
         Task<ProductResponse?> GetByIdAsync(Guid id);
         Task<List<ProductResponse>> GetAllAsync();
 
-        Task UpdateAsync(UpdateProductRequest request);
-        Task UpdateStatusAsync(UpdateProductStatusRequest request);
-        Task UpdateStockAsync(UpdateProductStockRequest request);
+        Task UpdateAsync(Guid id, UpdateProductRequest request);
+        Task UpdateStatusAsync(Guid id, UpdateProductStatusRequest request);
+        Task SetStockAsync(Guid id, SetProductStockRequest request);
     }
 }
