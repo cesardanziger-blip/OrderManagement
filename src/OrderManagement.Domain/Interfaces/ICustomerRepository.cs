@@ -10,5 +10,6 @@ namespace OrderManagement.Domain.Interfaces
         Task SaveChangesAsync();
         Task<bool> EmailExistsAsync(string email);
         Task<bool> DocumentExistsAsync(string document);
+        Task UpdateAsync(Customer customer);
     }
 }

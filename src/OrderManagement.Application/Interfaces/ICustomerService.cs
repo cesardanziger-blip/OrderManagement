@@ -9,6 +9,6 @@ namespace OrderManagement.Application.Interfaces
         Task<List<CustomerResponse>> GetAllAsync();
         Task<CustomerResponse?> GetByIdAsync(Guid id);
 
-        Task DeactivateAsync(Guid id);
+        Task UpdateStatusAsync(Guid id, UpdateCustomerStatusRequest request);
     }
 }

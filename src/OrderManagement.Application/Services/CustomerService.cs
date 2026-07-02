@@ -1,5 +1,6 @@
 ﻿using OrderManagement.Application.Contracts.Requests;
 using OrderManagement.Application.Contracts.Responses;
+using OrderManagement.Application.Exceptions;
 using OrderManagement.Application.Interfaces;
 using OrderManagement.Application.Mappings;
 using OrderManagement.Domain.Interfaces;
@@ -39,18 +40,23 @@ namespace OrderManagement.Application.Services
 
         public async Task<CustomerResponse?> GetByIdAsync(Guid id)
         {
-            var customer = await _customerRepository.GetByIdAsync(id);
+            var customer = await _customerRepository.GetByIdAsync(id)
+                ?? throw new CustomerNotFoundException(id);
 
             return customer?.ToResponse();
         }
 
-        public async Task DeactivateAsync(Guid id)
+        public async Task UpdateStatusAsync(Guid id, UpdateCustomerStatusRequest request)
         {
-            var customer = await _customerRepository.GetByIdAsync(id) ?? throw new Exception("Customer not found.");
+            var customer = await _customerRepository.GetByIdAsync(id)
+                ?? throw new CustomerNotFoundException(id);
 
-            customer.Deactivate();
+            if (request.Active)
+                customer.Activate();
+            else
+                customer.Deactivate();
 
-            await _customerRepository.SaveChangesAsync();
+            await _customerRepository.UpdateAsync(customer);
         }
     }
 }

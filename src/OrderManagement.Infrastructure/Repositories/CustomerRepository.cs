@@ -44,5 +44,11 @@ namespace OrderManagement.Infrastructure.Repositories
         {
             return _context.Customers.AnyAsync(x => x.Document == document);
         }
+
+        public async Task UpdateAsync(Customer customer)
+        {
+            _context.Customers.Update(customer);
+            await _context.SaveChangesAsync();
+        }
     }
 }

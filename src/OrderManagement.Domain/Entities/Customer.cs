@@ -40,11 +40,17 @@ namespace OrderManagement.Domain.Entities
 
         public void Deactivate()
         {
+            if (Status == CustomerStatus.Inactive)
+                throw new InvalidOperationException("Customer is already inactive.");
+
             Status = CustomerStatus.Inactive;
             Touch();
         }
         public void Activate()
         {
+            if (Status == CustomerStatus.Active)
+                throw new InvalidOperationException("Customer is already active.");
+
             Status = CustomerStatus.Active;
             Touch();
         }

@@ -61,9 +61,9 @@ namespace OrderManagement.API.Controllers
         [HttpPatch("{id:guid}/status")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateStatus(Guid id)
+        public async Task<IActionResult> UpdateStatus(Guid id, UpdateCustomerStatusRequest request)
         {
-            await _customerService.DeactivateAsync(id);
+            await _customerService.UpdateStatusAsync(id, request);
             return NoContent();
         }
     }
