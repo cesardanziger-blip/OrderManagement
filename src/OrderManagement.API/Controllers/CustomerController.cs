@@ -20,7 +20,9 @@ namespace OrderManagement.API.Controllers
         /// Creates a new customer.
         /// </summary>
         [HttpPost]
-        public async Task<ActionResult<Guid>> Create([FromBody] CreateCustomerRequest request)
+        [ProducesResponseType(typeof(CustomerResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<CustomerResponse>> Create([FromBody] CreateCustomerRequest request)
         {
             var id = await _customerService.CreateAsync(request);
             return CreatedAtAction(nameof(GetById), new { id }, id);
@@ -30,6 +32,8 @@ namespace OrderManagement.API.Controllers
         /// Returns a customer by id.
         /// </summary>
         [HttpGet("{id:guid}")]
+        [ProducesResponseType(typeof(CustomerResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<CustomerResponse>> GetById(Guid id)
         {
             var customer = await _customerService.GetByIdAsync(id);
@@ -44,6 +48,7 @@ namespace OrderManagement.API.Controllers
         /// Returns all customers.
         /// </summary>
         [HttpGet]
+        [ProducesResponseType(typeof(List<CustomerResponse>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<CustomerResponse>>> GetAll()
         {
             var customers = await _customerService.GetAllAsync();
@@ -54,6 +59,8 @@ namespace OrderManagement.API.Controllers
         /// Activates or deactivates a customer.
         /// </summary>
         [HttpPatch("{id:guid}/status")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UpdateStatus(Guid id)
         {
             await _customerService.DeactivateAsync(id);

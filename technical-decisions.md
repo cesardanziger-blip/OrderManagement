@@ -22,9 +22,16 @@ Principais decisões:
 - Controle de estoque dentro da entidade Product
 
 ## Time & Money Strategy
+### Datas
 
-- Datas utilizam UTC (`DateTime.UtcNow`)
-- Valores monetários são representados com `decimal` para precisão
+- Todos os timestamps são persistidos em UTC utilizando `DateTime.UtcNow`.
+- Durante o mapeamento para os contratos de resposta, as datas são convertidas para o fuso horário `America/Sao_Paulo` através de uma extensão (`DateTimeExtensions`).
+- Essa abordagem mantém a persistência independente do ambiente de execução e atende ao requisito de exibição das datas no horário local.
+
+### Valores monetários
+
+- Valores monetários são representados utilizando o tipo `decimal`, evitando perda de precisão inerente aos tipos de ponto flutuante.
+- Todos os cálculos de totais dos pedidos são realizados pela aplicação, garantindo consistência entre os itens e o valor final do pedido.
 
 ## Persistence Strategy (EF Core)
 
@@ -32,8 +39,9 @@ O projeto utiliza Entity Framework Core com Fluent API para configuração das e
 
 Decisões principais:
 - Configurações isoladas por entidade utilizando `IEntityTypeConfiguration<T>`
-- Uso de `HasConversion<int>()` para persistência de enums como inteiros
+- Uso de `HasConversion<int>()` para persistência de enums como inteiros, reduzindo o espaço de armazenamento e desacoplando a representação do banco da forma como os dados são expostos pela API.
 - Definição de índices únicos para Email e Document, considerando apenas registros ativos
+- Os enums são serializados como texto nas respostas da API utilizando `JsonStringEnumConverter`, mantendo a persistência otimizada e tornando o contrato da API mais legível.
 
 ## Decisões arquiteturais
 
@@ -43,6 +51,7 @@ Decisões principais:
 - Mapeamentos foram isolados via extension methods
 - Infrastructure é responsável exclusivamente por persistência
 - API não acessa Domain diretamente, apenas Application Layer
+- Conversões de entidades para contratos foram centralizadas em extension methods, incluindo formatação de enums e conversão de datas para o fuso horário da aplicação.
 
 ## Validation strategy
 

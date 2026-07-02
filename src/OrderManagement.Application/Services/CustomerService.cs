@@ -17,15 +17,12 @@ namespace OrderManagement.Application.Services
 
         public async Task<CustomerResponse> CreateAsync(CreateCustomerRequest request)
         {
-            var emailExists = await _customerRepository.EmailExistsAsync(request.Email);
+            if (await _customerRepository.EmailExistsAsync(request.Email))
+                throw new DuplicateCustomerException("email");
 
-            if (emailExists)
-                throw new Exception("Email already exists.");
+            if (await _customerRepository.DocumentExistsAsync(request.Document))
+                throw new DuplicateCustomerException("document");
 
-            var documentExists = await _customerRepository.DocumentExistsAsync(request.Document);
-
-            if (documentExists)
-                throw new Exception("Document already exists.");
 
             var customer = request.ToDomain();
             await _customerRepository.CreateAsync(customer);

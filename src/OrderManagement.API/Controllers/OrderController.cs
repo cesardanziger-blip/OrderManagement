@@ -20,9 +20,9 @@ namespace OrderManagement.API.Controllers
         /// Creates a new order.
         /// </summary>
         [HttpPost]
-        [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(OrderResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<Guid>> Create([FromBody] CreateOrderRequest request)
+        public async Task<ActionResult<OrderResponse>> Create([FromBody] CreateOrderRequest request)
         {
             var id = await _orderService.CreateAsync(request);
 

@@ -27,24 +27,6 @@ namespace OrderManagement.Application.Validators.Customer
                 .NotEmpty()
                 .Must(CpfCnpjValidator.IsValidCpfOrCnpj)
                 .WithMessage("Invalid CPF or CNPJ.");
-
-            RuleFor(x => x)
-                .MustAsync(BeUniqueEmail)
-                .WithMessage("An active customer with this email already exists.");
-
-            RuleFor(x => x)
-                .MustAsync(BeUniqueDocument)
-                .WithMessage("An active customer with this document already exists.");
-        }
-
-        private async Task<bool> BeUniqueEmail(CreateCustomerRequest request, CancellationToken ct)
-        {
-            return !await _repository.EmailExistsAsync(request.Email);
-        }
-
-        private async Task<bool> BeUniqueDocument(CreateCustomerRequest request, CancellationToken ct)
-        {
-            return !await _repository.DocumentExistsAsync(request.Document);
         }
     }
 }
