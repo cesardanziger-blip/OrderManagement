@@ -16,7 +16,9 @@ namespace OrderManagement.API.Controllers
             _customerService = customerService;
         }
 
-        // POST: api/customers
+        /// <summary>
+        /// Creates a new customer.
+        /// </summary>
         [HttpPost]
         public async Task<ActionResult<Guid>> Create([FromBody] CreateCustomerRequest request)
         {
@@ -24,7 +26,9 @@ namespace OrderManagement.API.Controllers
             return CreatedAtAction(nameof(GetById), new { id }, id);
         }
 
-        // GET: api/customers/{id}
+        /// <summary>
+        /// Returns a customer by id.
+        /// </summary>
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<CustomerResponse>> GetById(Guid id)
         {
@@ -36,7 +40,9 @@ namespace OrderManagement.API.Controllers
             return Ok(customer);
         }
 
-        // GET: api/customers
+        /// <summary>
+        /// Returns all customers.
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<List<CustomerResponse>>> GetAll()
         {
@@ -44,7 +50,9 @@ namespace OrderManagement.API.Controllers
             return Ok(customers);
         }
 
-        // PATCH: api/customers/{id}/status
+        /// <summary>
+        /// Activates or deactivates a customer.
+        /// </summary>
         [HttpPatch("{id:guid}/status")]
         public async Task<IActionResult> UpdateStatus(Guid id)
         {
