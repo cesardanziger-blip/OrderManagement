@@ -88,6 +88,31 @@ Benefícios:
 - Melhora a clareza dos contratos
 - Permite validação visual das respostas HTTP
 
+## Customer Status Management
+
+O gerenciamento de status do cliente é realizado através de regras encapsuladas na própria entidade `Customer`, seguindo o conceito de entidade rica.
+
+Decisão arquitetural:
+- O status do cliente é representado por um enum (`CustomerStatus`), garantindo tipagem forte e clareza de domínio
+- As transições de estado são controladas exclusivamente pela entidade, através dos métodos `Activate()` e `Deactivate()`
+- Não é permitido alterar diretamente o status sem passar pelas regras de domínio
+
+Fluxo permitido:
+- Inactive → Active
+- Active → Inactive
+
+Regras de domínio:
+- Um cliente ativo não pode ser ativado novamente
+- Um cliente inativo não pode ser desativado novamente
+- Tentativas de transição inválida são bloqueadas pela entidade e resultam em exceção de regra de negócio
+
+Benefícios:
+- Garante consistência do estado da entidade
+- Evita alterações diretas sem validação das regras de domínio
+- Centraliza regras de negócio dentro da entidade Customer
+- Facilita testes unitários da lógica de estado
+- Reduz dependência de lógica de validação na camada de aplicação
+
 ## Order Status Management
 
 O gerenciamento de status de pedidos é realizado através de um único endpoint:
@@ -127,3 +152,4 @@ Benefícios:
 - Rastreabilidade completa do ciclo de vida do pedido
 - Consistência na auditoria de estados
 - Facilidade de debugging e análise de fluxo
+

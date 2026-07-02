@@ -201,7 +201,7 @@ Cobertura prevista:
 ### Persistência
 - [x] Configuração das entidades (EF Core)
 - [x] Repositórios
-- [ ] Migrations
+- [x] Migrations
 
 ### Aplicação
 - [x] Casos de uso
