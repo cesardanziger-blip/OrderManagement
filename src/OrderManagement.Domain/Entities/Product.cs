@@ -54,9 +54,6 @@ namespace OrderManagement.Domain.Entities
 
         public void DecreaseStock(int quantity)
         {
-            if (Status != ProductStatus.Active)
-                throw new InvalidOperationException("Inactive product cannot have its stock changed.");
-
             if (quantity <= 0)
                 throw new ArgumentException("Quantity cant be negative.", nameof(quantity));
 
@@ -81,9 +78,6 @@ namespace OrderManagement.Domain.Entities
 
         public void SetStock(int quantity)
         {
-            if (Status != ProductStatus.Active)
-                throw new InvalidOperationException("Inactive product cannot have its stock changed.");
-
             if (quantity < 0)
                 throw new ArgumentException("Stock cannot be negative.", nameof(quantity));
 

@@ -49,6 +49,9 @@ namespace OrderManagement.Application.Services
                 if (product.Status != ProductStatus.Active)
                     throw new InactiveProductException(item.ProductId);
 
+                if (product.Stock < item.Quantity)
+                    throw new InsufficientStockException(product.Id,product.Name);
+
                 product.DecreaseStock(item.Quantity);
 
                 order.AddItem(product, item.Quantity);
