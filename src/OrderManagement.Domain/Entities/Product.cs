@@ -73,6 +73,18 @@ namespace OrderManagement.Domain.Entities
             Touch();
         }
 
+        public void UpdateStock(int quantity)
+        {
+            if (Status != ProductStatus.Active)
+                throw new InvalidOperationException("Inactive product cannot have its stock changed.");
+
+            if (quantity < 0)
+                throw new ArgumentException("Stock cannot be negative.", nameof(quantity));
+
+            Stock = quantity;
+            Touch();
+        }
+
         public void UpdateDetails(string name, string description)
         {
             if (string.IsNullOrWhiteSpace(name))

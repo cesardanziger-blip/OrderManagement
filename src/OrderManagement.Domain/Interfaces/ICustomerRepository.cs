@@ -8,5 +8,7 @@ namespace OrderManagement.Domain.Interfaces
         Task<List<Customer>> GetAllAsync();
         Task<Customer?> GetByIdAsync(Guid id);
         Task SaveChangesAsync();
+        Task<bool> EmailExistsAsync(string email);
+        Task<bool> DocumentExistsAsync(string document);
     }
 }
