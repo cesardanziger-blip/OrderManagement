@@ -6,7 +6,7 @@ using OrderManagement.Application.Interfaces;
 namespace OrderManagement.API.Controllers
 {
     [ApiController]
-    [Route("api/customers")]
+    [Route("api/[controller]")]
     public class CustomerController : ControllerBase
     {
         private readonly ICustomerService _customerService;

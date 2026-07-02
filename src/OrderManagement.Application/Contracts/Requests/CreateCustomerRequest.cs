@@ -2,8 +2,8 @@
 {
     public class CreateCustomerRequest
     {
-        public string Name { get; private set; } = String.Empty;
-        public string Email { get; private set; } = String.Empty;
-        public string Document { get; private set; } = String.Empty;
+        public string Name { get; set; } = String.Empty;
+        public string Email { get; set; } = String.Empty;
+        public string Document { get; set; } = String.Empty;
     }
 }
