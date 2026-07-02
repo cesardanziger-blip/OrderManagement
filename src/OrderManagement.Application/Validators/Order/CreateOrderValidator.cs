@@ -1,8 +1,9 @@
 ﻿using FluentValidation;
+using OrderManagement.Application.Contracts.Requests;
 
 namespace OrderManagement.Application.Validators.Order
 {
-    public class CreateOrderValidator : AbstractValidator<CreateOrderCommand>
+    public class CreateOrderValidator : AbstractValidator<CreateOrderRequest>
     {
         public CreateOrderValidator()
         {
@@ -14,16 +15,8 @@ namespace OrderManagement.Application.Validators.Order
                 .NotEmpty()
                 .WithMessage("Order must contain at least one item.");
 
-            RuleForEach(x => x.Items).ChildRules(item =>
-            {
-                item.RuleFor(i => i.ProductId)
-                    .NotEmpty()
-                    .WithMessage("ProductId is required.");
-
-                item.RuleFor(i => i.Quantity)
-                    .GreaterThan(0)
-                    .WithMessage("Quantity must be greater than zero.");
-            });
+            RuleForEach(x => x.Items)
+                .SetValidator(new CreateOrderItemValidator());
         }
     }
 }

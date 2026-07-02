@@ -1,10 +1,11 @@
 ﻿using FluentValidation;
+using OrderManagement.Application.Contracts.Requests;
 using OrderManagement.Application.Validators.Common;
 using OrderManagement.Domain.Interfaces;
 
 namespace OrderManagement.Application.Validators.Customer
 {
-    public class CreateCustomerValidator : AbstractValidator<CreateCustomerCommand>
+    public class CreateCustomerValidator : AbstractValidator<CreateCustomerRequest>
     {
         private readonly ICustomerRepository _repository;
 
@@ -36,12 +37,12 @@ namespace OrderManagement.Application.Validators.Customer
                 .WithMessage("An active customer with this document already exists.");
         }
 
-        private async Task<bool> BeUniqueEmail(CreateCustomerCommand request, CancellationToken ct)
+        private async Task<bool> BeUniqueEmail(CreateCustomerRequest request, CancellationToken ct)
         {
             return !await _repository.EmailExistsAsync(request.Email);
         }
 
-        private async Task<bool> BeUniqueDocument(CreateCustomerCommand request, CancellationToken ct)
+        private async Task<bool> BeUniqueDocument(CreateCustomerRequest request, CancellationToken ct)
         {
             return !await _repository.DocumentExistsAsync(request.Document);
         }

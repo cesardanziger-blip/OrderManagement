@@ -1,8 +1,9 @@
 ﻿using FluentValidation;
+using OrderManagement.Application.Contracts.Requests;
 
 namespace OrderManagement.Application.Validators.Products
 {
-    public class CreateProductValidator : AbstractValidator<CreateProductCommand>
+    public class CreateProductValidator : AbstractValidator<CreateProductRequest>
     {
         public CreateProductValidator()
         {

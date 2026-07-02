@@ -102,5 +102,42 @@ namespace OrderManagement.Application.Services
 
             await _orderRepository.UpdateAsync(order);
         }
+
+        public async Task UpdateStatusAsync(Guid id, UpdateOrderStatusRequest request)
+        {
+            var order = await _orderRepository.GetByIdAsync(id)
+                ?? throw new Exception("Order not found.");
+
+            switch (request.Status)
+            {
+                case OrderStatus.Paid:
+                    order.MarkAsPaid(request.Reason);
+                    break;
+
+                case OrderStatus.Shipped:
+                    order.MarkAsShipped(request.Reason);
+                    break;
+
+                case OrderStatus.Cancelled:
+                    order.MarkAsCancelled(request.Reason);
+
+                    foreach (var item in order.Items)
+                    {
+                        var product = await _productRepository.GetByIdAsync(item.ProductId)
+                            ?? throw new Exception("Product not found.");
+
+                        product.IncreaseStock(item.Quantity);
+
+                        await _productRepository.UpdateAsync(product);
+                    }
+
+                    break;
+
+                default:
+                    throw new InvalidOperationException("Invalid status transition.");
+            }
+
+            await _orderRepository.UpdateAsync(order);
+        }
     }
 }

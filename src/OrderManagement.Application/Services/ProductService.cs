@@ -15,10 +15,12 @@ namespace OrderManagement.Application.Services
             _productRepository = productRepository;
         }
 
-        public async Task CreateAsync(CreateProductRequest request)
+        public async Task<ProductResponse> CreateAsync(CreateProductRequest request)
         {
             var product = request.ToDomain();
             await _productRepository.CreateAsync(product);
+
+            return product.ToResponse();
         }
 
         public async Task<List<ProductResponse>> GetAllAsync()
@@ -46,42 +48,25 @@ namespace OrderManagement.Application.Services
             await _productRepository.UpdateAsync(product);
         }
 
-        public async Task ActivateAsync(Guid id)
+        public async Task UpdateStatusAsync(UpdateProductStatusRequest request)
         {
-            var product = await _productRepository.GetByIdAsync(id)
+            var product = await _productRepository.GetByIdAsync(request.Id)
                 ?? throw new Exception("Product not found.");
 
-            product.Activate();
+            if (request.Active)
+                product.Activate();
+            else
+                product.Deactivate();
 
             await _productRepository.UpdateAsync(product);
         }
 
-        public async Task DeactivateAsync(Guid id)
+        public async Task UpdateStockAsync(UpdateProductStockRequest request)
         {
-            var product = await _productRepository.GetByIdAsync(id)
-                ?? throw new Exception("Product not found.");
+            var product = await _productRepository.GetByIdAsync(request.Id)
+                ?? throw new Exception("Product not found.");            
 
-            product.Deactivate();
-
-            await _productRepository.UpdateAsync(product);
-        }
-
-        public async Task AddStockAsync(Guid productId, int quantity)
-        {
-            var product = await _productRepository.GetByIdAsync(productId)
-                ?? throw new Exception("Product not found.");
-
-            product.IncreaseStock(quantity);
-
-            await _productRepository.UpdateAsync(product);
-        }
-
-        public async Task RemoveStockAsync(Guid productId, int quantity)
-        {
-            var product = await _productRepository.GetByIdAsync(productId)
-                ?? throw new Exception("Product not found.");
-
-            product.DecreaseStock(quantity);
+            product.UpdateStock(request.Quantity);
 
             await _productRepository.UpdateAsync(product);
         }

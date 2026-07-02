@@ -15,7 +15,7 @@ namespace OrderManagement.Application.Services
             _customerRepository = customerRepository;
         }
 
-        public async Task CreateAsync(CreateCustomerRequest request)
+        public async Task<CustomerResponse> CreateAsync(CreateCustomerRequest request)
         {
             var emailExists = await _customerRepository.EmailExistsAsync(request.Email);
 
@@ -29,6 +29,8 @@ namespace OrderManagement.Application.Services
 
             var customer = request.ToDomain();
             await _customerRepository.CreateAsync(customer);
+
+            return customer.ToResponse();
         }
 
         public async Task<List<CustomerResponse>> GetAllAsync()

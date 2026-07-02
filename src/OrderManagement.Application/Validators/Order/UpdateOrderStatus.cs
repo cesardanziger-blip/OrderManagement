@@ -1,16 +1,17 @@
 ﻿using FluentValidation;
+using OrderManagement.Application.Contracts.Requests;
 
 namespace OrderManagement.Application.Validators.Order
 {
-    public class UpdateOrderStatusValidator : AbstractValidator<UpdateOrderStatusCommand>
+    public class UpdateOrderStatusValidator : AbstractValidator<UpdateOrderStatusRequest>
     {
         public UpdateOrderStatusValidator()
         {
-            RuleFor(x => x.OrderId)
+            RuleFor(x => x.Id)
                 .NotEmpty()
                 .WithMessage("OrderId is required.");
 
-            RuleFor(x => x.NewStatus)
+            RuleFor(x => x.Status)
                 .IsInEnum()
                 .WithMessage("Invalid order status.");
 

@@ -8,9 +8,6 @@ namespace OrderManagement.Application.Interfaces
         Task<Guid> CreateAsync(CreateOrderRequest request);
         Task<OrderResponse?> GetByIdAsync(Guid id);
         Task<List<OrderResponse>> GetAllAsync();
-
-        Task PayAsync(Guid id);
-        Task ShipAsync(Guid id);
-        Task CancelAsync(Guid id);
+        Task UpdateStatusAsync(Guid id, UpdateOrderStatusRequest request);
     }
 }
