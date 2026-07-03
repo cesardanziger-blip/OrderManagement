@@ -222,7 +222,7 @@ Cobertura prevista:
 
 ### Infraestrutura
 - [ ] Docker
-- [ ] Tratamento global de exceções
+- [x] Tratamento global de exceções
 
 ### Regras de negócio principais
 Clientes inativos não podem criar pedidos
