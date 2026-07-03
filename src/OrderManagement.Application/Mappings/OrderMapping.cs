@@ -27,6 +27,7 @@ namespace OrderManagement.Application.Mappings
                     .ToList(),
 
                 History = order.History
+                    .OrderBy(h => h.ModificationDate)
                     .Select(h => new OrderHistoryResponse
                     {
                         Id = h.Id,

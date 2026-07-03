@@ -4,7 +4,7 @@ namespace OrderManagement.Domain.Entities
 {
     public class OrderHistory
     {
-        public Guid Id { get; private set; }
+        public Guid Id { get; private set; } = Guid.NewGuid();
         public Guid OrderId { get; private set; }
         public OrderStatus PreviousStatus { get; private set; }
         public OrderStatus NewStatus { get; private set; }
@@ -21,6 +21,16 @@ namespace OrderManagement.Domain.Entities
             NewStatus = newStatus;
             ModificationDate = DateTime.UtcNow;
             Reason = reason ?? string.Empty;
+        }
+
+        public static OrderHistory Create(Order order)
+        {
+            return new OrderHistory(
+                order.Id,
+                OrderStatus.Created,
+                OrderStatus.Created,
+                "Order created"
+            );
         }
     }
 }

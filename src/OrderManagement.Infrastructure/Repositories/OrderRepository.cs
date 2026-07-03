@@ -21,12 +21,16 @@ namespace OrderManagement.Infrastructure.Repositories
 
         public async Task<List<Order>> GetAllAsync()
         {
-            return await _context.Orders.ToListAsync();
+            return await _context.Orders.Include(x => x.Items)
+                            .Include(x => x.History)
+                            .ToListAsync();
         }
 
         public async Task<Order?> GetByIdAsync(Guid id)
         {
-            return await _context.Orders.FirstOrDefaultAsync(x => x.Id == id);
+            return await _context.Orders.Include(x => x.Items)
+                                        .Include(x => x.History)
+                                        .FirstOrDefaultAsync(x => x.Id == id);            
         }
     }
 }

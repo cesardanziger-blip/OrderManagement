@@ -28,5 +28,6 @@ namespace OrderManagement.Infrastructure.Repositories
         {
             return await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
         }
+
     }
 }

@@ -17,19 +17,22 @@ namespace OrderManagement.Application.Services
         private readonly IProductRepository _productRepository;
         private readonly ICustomerRepository _customerRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IOrderHistoryRepository _orderHistoryRepository;
 
         public OrderService(IOrderRepository orderRepository,
             IProductRepository productRepository,
             ICustomerRepository customerRepository,
+            IOrderHistoryRepository orderHistoryRepository,
             IUnitOfWork unitOfWork)
         {
             _orderRepository = orderRepository;
             _productRepository = productRepository;
             _customerRepository = customerRepository;
+            _orderHistoryRepository = orderHistoryRepository;
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Guid> CreateAsync(CreateOrderRequest request)
+        public async Task<OrderResponse> CreateAsync(CreateOrderRequest request)
         {
             var customerId = request.CustomerId;
 
@@ -58,14 +61,21 @@ namespace OrderManagement.Application.Services
             }
 
             await _orderRepository.CreateAsync(order);
+
+            await _orderHistoryRepository.AddAsync(
+                OrderHistory.Create(order)
+            );
+
             await _unitOfWork.SaveChangesAsync();
 
-            return order.Id;
+            return order.ToResponse();
         }
 
         public async Task<OrderResponse> GetByIdAsync(Guid id)
         {
-            var order = await _orderRepository.GetByIdAsync(id);
+            var order = await _orderRepository.GetByIdAsync(id)
+                ?? throw new OrderNotFoundException(id);
+
             return order.ToResponse();
         }
 
@@ -81,32 +91,43 @@ namespace OrderManagement.Application.Services
             var order = await _orderRepository.GetByIdAsync(id)
                 ?? throw new OrderNotFoundException(id);
 
+            var previousStatus = order.Status;
+
+            if (request.Status == order.Status)
+                throw new InvalidOrderStatusTransitionException();
+
             switch (request.Status)
             {
                 case OrderStatus.Paid:
-                    order.MarkAsPaid(request.Reason);
+                    order.MarkAsPaid();
                     break;
 
                 case OrderStatus.Shipped:
-                    order.MarkAsShipped(request.Reason);
+                    order.MarkAsShipped();
                     break;
 
                 case OrderStatus.Cancelled:
-                    order.MarkAsCancelled(request.Reason);
-
-                    foreach (var item in order.Items)
                     {
-                        var product = await _productRepository.GetByIdAsync(item.ProductId)
-                             ?? throw new ProductNotFoundException(item.ProductId);
+                        order.MarkAsCancelled(request.Reason);
 
-                        product.IncreaseStock(item.Quantity);
+                        if (previousStatus == OrderStatus.Shipped)
+                            throw new InvalidOperationException("Shipped orders cannot be cancelled.");
+
+                            foreach (var item in order.Items)
+                            {
+                                var product = await _productRepository.GetByIdAsync(item.ProductId)
+                                    ?? throw new ProductNotFoundException(item.ProductId);
+
+                                product.IncreaseStock(item.Quantity);
+                            }
+
+                        break;
                     }
-
-                    break;
-
-                default:
-                    throw new InvalidOrderStatusTransitionException();
             }
+
+            await _orderHistoryRepository.AddAsync(
+                new OrderHistory(order.Id, previousStatus, order.Status, request.Reason)
+            );
 
             await _unitOfWork.SaveChangesAsync();
         }

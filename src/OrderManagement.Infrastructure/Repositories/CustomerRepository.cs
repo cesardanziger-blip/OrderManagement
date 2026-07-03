@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OrderManagement.Domain.Entities;
+using OrderManagement.Domain.Enums;
 using OrderManagement.Domain.Interfaces;
 using OrderManagement.Infrastructure.Context;
 
@@ -31,12 +32,12 @@ namespace OrderManagement.Infrastructure.Repositories
 
         public Task<bool> EmailExistsAsync(string email)
         {
-            return _context.Customers.AnyAsync(x => x.Email == email);
+            return _context.Customers.AnyAsync(x =>x.Email == email && x.Status == CustomerStatus.Active);
         }
 
         public Task<bool> DocumentExistsAsync(string document)
         {
-            return _context.Customers.AnyAsync(x => x.Document == document);
+            return _context.Customers.AnyAsync(x => x.Document == document && x.Status == CustomerStatus.Active);
         }
     }
 }

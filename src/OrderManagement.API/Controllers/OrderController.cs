@@ -24,9 +24,9 @@ namespace OrderManagement.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<OrderResponse>> Create([FromBody] CreateOrderRequest request)
         {
-            var id = await _orderService.CreateAsync(request);
+            var order = await _orderService.CreateAsync(request);
 
-            return CreatedAtAction(nameof(GetById), new { id }, id);
+            return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
         }
 
         /// <summary>

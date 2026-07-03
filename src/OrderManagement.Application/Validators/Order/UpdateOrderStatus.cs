@@ -7,10 +7,6 @@ namespace OrderManagement.Application.Validators.Order
     {
         public UpdateOrderStatusValidator()
         {
-            RuleFor(x => x.Id)
-                .NotEmpty()
-                .WithMessage("OrderId is required.");
-
             RuleFor(x => x.Status)
                 .IsInEnum()
                 .WithMessage("Invalid order status.");

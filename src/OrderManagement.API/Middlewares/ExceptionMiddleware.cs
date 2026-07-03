@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using OrderManagement.Application.Exceptions.Common;
 
 namespace OrderManagement.API.Middlewares;
@@ -58,6 +59,17 @@ public class ExceptionMiddleware
                 StatusCodes.Status409Conflict,
                 "Invalid operation",
                 ex.Message);
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            foreach (var entry in ex.Entries)
+            {
+                var dbValues = await entry.GetDatabaseValuesAsync();
+                var currentValues = entry.CurrentValues;
+                var originalValues = entry.OriginalValues;
+            }
+
+            throw;
         }
         catch (Exception ex)
         {
