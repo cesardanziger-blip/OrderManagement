@@ -19,7 +19,83 @@ O projeto foi estruturado com foco em clareza de domínio, consistência de regr
 - Moq
 - FluentAssertions
 - Docker
+
 ---
+
+### Executar aplicação
+### Pré-requisitos
+- .NET 10 SDK
+- SQL Server
+
+```bash
+dotnet restore
+dotnet build
+dotnet run --project src/OrderManagement.API
+```
+---
+
+## Executando com Docker
+### Pré-requisitos
+
+- Docker Desktop instalado
+- Docker Desktop em execução (Engine Running)
+
+### Iniciar a aplicação
+
+```bash
+docker compose up --build
+```
+
+Na primeira execução, a API aplica automaticamente as migrations do Entity Framework Core e cria o banco de dados, caso ele ainda não exista.
+
+### Acessar a aplicação
+
+API
+
+```
+http://localhost:8080
+```
+
+Swagger
+
+```
+http://localhost:8080/swagger
+```
+
+### Encerrar os containers
+
+```bash
+docker compose down
+```
+
+Para remover também o volume persistente do SQL Server:
+
+```bash
+docker compose down -v
+```
+---
+
+###  Endpoints principais
+
+Customers
+POST   /api/customers
+GET    /api/customers
+GET    /api/customers/{id}
+
+Products
+POST   /api/products
+GET    /api/products
+PATCH  /api/products/{id}/status
+PATCH  /api/products/{id}/stock
+
+Orders
+POST   /api/orders
+GET    /api/orders
+GET    /api/orders/{id}
+PATCH  /api/orders/{id}/status
+
+---
+
 ## Arquitetura
 
 A solução segue princípios de:
@@ -60,18 +136,6 @@ Histórico completo de mudanças é registrado via OrderHistory
 Status controlado exclusivamente pela entidade Order
 
 ---
-### Histórico de pedidos
-
-O sistema mantém auditoria completa de alterações de status.
-
-Registro criado automaticamente no momento da criação do pedido
-Histórico inclui:
-Status anterior
-Novo status
-Data da alteração
-Motivo (quando aplicável)
-
----
 
 ### Controle de estoque
 
@@ -87,6 +151,18 @@ Trade-off:
 - Em cenários reais de alta concorrência, isso seria necessário para evitar race conditions
 
 ---
+### Histórico de pedidos
+
+O sistema mantém auditoria completa de alterações de status.
+
+Registro criado automaticamente no momento da criação do pedido
+Histórico inclui:
+Status anterior
+Novo status
+Data da alteração
+Motivo (quando aplicável)
+
+---
 ## Principais decisões técnicas
 
 - Uso de Contracts ao invés de DTOs para separar claramente as camadas de entrada e saída da API
@@ -96,26 +172,6 @@ Trade-off:
 - Uso do tipo decimal para representar valores monetários com precisão
 - Datas armazenadas em UTC (DateTime.UtcNow) para garantir consistência temporal
 - Uso de enums para controle de estado (Customer, Product e Order), reduzindo estados inválidos
-
----
-###  Endpoints principais
-
-Customers
-POST /api/customers
-GET /api/customers (paginado)
-GET /api/customers/{id}
-
-Products
-POST /api/products
-GET /api/products (paginado)
-PATCH /api/products/{id}/status
-PATCH /api/products/{id}/stock
-
-Orders
-POST /api/orders
-GET /api/orders (paginado)
-GET /api/orders/{id}
-PATCH /api/orders/{id}/status
 
 ---
 
@@ -265,6 +321,16 @@ Disponível em:
 - Separação clara entre validação de entrada (FluentValidation) e regras de negócio (Domain)
 
 ---
+
+### Como executar os testes
+
+Na raiz do projeto:
+
+```bash
+dotnet test
+```
+---
+
 ## Roadmap
 
 ### Estrutura inicial
@@ -305,78 +371,6 @@ Disponível em:
 
 ---
 
-### Testes automatizados
-
-Foram implementados testes unitários com foco em regras de negócio críticas, totalizando **40 cenários validados**.
-
-**Estratégia adotada:**
-- Isolamento de dependências com Moq
-- Validação de comportamento do domínio
-- Cobertura dos fluxos mais sensíveis (estoque, pedidos e status)
-
-Os testes priorizam regras de negócio ao invés de cobertura completa de endpoints.
-
-**Trade-off:**
-- Não foi priorizada cobertura completa de toda a camada de aplicação e infraestrutura
-- Foco em consistência de regras críticas do domínio
-
-### Como executar os testes
-
-Na raiz do projeto:
-
-```bash
-dotnet test
-```
----
-### Executar aplicação
-### Pré-requisitos
-- .NET 10 SDK
-- SQL Server
----
-```bash
-dotnet restore
-dotnet build
-dotnet run --project src/OrderManagement.API
-```
----
-## Executando com Docker
-### Pré-requisitos
-
-- Docker Desktop
-
-### Iniciar a aplicação
-
-```bash
-docker compose up --build
-```
-
-Na primeira execução, a API aplica automaticamente as migrations do Entity Framework Core e cria o banco de dados, caso ele ainda não exista.
-
-### Acessar a aplicação
-
-API
-
-```
-http://localhost:8080
-```
-
-Swagger
-
-```
-http://localhost:8080/swagger
-```
-
-### Encerrar os containers
-
-```bash
-docker compose down
-```
-
-Para remover também o volume persistente do SQL Server:
-
-```bash
-docker compose down -v
-```
 ### Observação final
 Este projeto foi desenvolvido com foco em:
 
