@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/Itens de Solução/">
+    <File Path="docker-compose.yml" />
     <File Path="notes.txt" />
     <File Path="README.md" />
     <File Path="technical-decisions.md" />

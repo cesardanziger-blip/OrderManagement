@@ -302,11 +302,10 @@ Disponível em:
 - [x] Tratamento global de exceções
 
 ---
+### Executar aplicação
 ### Pré-requisitos
 - .NET 10 SDK
 - SQL Server
----
-### Executar aplicação
 ---
 ```bash
 dotnet restore
@@ -314,6 +313,44 @@ dotnet build
 dotnet run --project src/OrderManagement.API
 ```
 ---
+## Executando com Docker
+### Pré-requisitos
+
+- Docker Desktop
+
+### Iniciar a aplicação
+
+```bash
+docker compose up --build
+```
+
+Na primeira execução, a API aplica automaticamente as migrations do Entity Framework Core e cria o banco de dados, caso ele ainda não exista.
+
+### Acessar a aplicação
+
+API
+
+```
+http://localhost:8080
+```
+
+Swagger
+
+```
+http://localhost:8080/swagger
+```
+
+### Encerrar os containers
+
+```bash
+docker compose down
+```
+
+Para remover também o volume persistente do SQL Server:
+
+```bash
+docker compose down -v
+```
 ### Observação final
 Este projeto foi desenvolvido com foco em:
 

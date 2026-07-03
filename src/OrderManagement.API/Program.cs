@@ -34,7 +34,7 @@ builder.Services.AddCors(options =>
 // Database
 builder.Services.AddDbContext<OrderManagementDbContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("OrderManagementDb")));
+        builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Swagger
 builder.Services.AddSwaggerGen(options =>
@@ -80,6 +80,13 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<OrderManagementDbContext>();
+
+    context.Database.Migrate();
+}
 
 app.UseAuthorization();
 

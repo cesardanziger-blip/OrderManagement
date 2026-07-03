@@ -1,0 +1,37 @@
+services:
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: ordermanagement-sql
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "OrderManagement@2026"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+
+  api:
+    build:
+      context: .
+      dockerfile: src/OrderManagement.API/Dockerfile
+
+    container_name: ordermanagement-api
+
+    depends_on:
+      - sqlserver
+
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: >
+        Server=sqlserver;
+        Database=OrderManagementDb;
+        User Id=sa;
+        Password=OrderManagement@2026;
+        TrustServerCertificate=True;
+
+    ports:
+      - "8080:8080"
+
+volumes:
+  sql_data:
