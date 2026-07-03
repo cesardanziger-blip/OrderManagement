@@ -90,25 +90,58 @@ Para remover também o volume persistente do SQL Server:
 docker compose down -v
 ```
 ---
+## Deploy em Ambiente Cloud (AWS)
 
+A aplicação foi publicada em ambiente real na AWS utilizando uma instância EC2 com Docker Compose, incluindo API e banco de dados SQL Server em containers separados.
+
+### Arquitetura do deploy
+
+- EC2 (Ubuntu)
+- Docker + Docker Compose
+- API .NET 10 rodando em container
+- SQL Server 2022 em container
+- Exposição da API via porta 8080
+- Swagger disponível publicamente para validação
+
+### URL de acesso (temporária)
+http://18.216.183.255:8080/swagger
+
+> A instância foi utilizada exclusivamente para validação e testes da entrega técnica.
+
+### Decisão de desligamento
+
+Após a validação do deploy e funcionamento completo da aplicação em ambiente cloud, a instância será/desligada ou foi desligada para evitar custos adicionais de infraestrutura.
+
+### Justificativa
+
+O ambiente AWS foi utilizado apenas como demonstração prática de deploy, comprovando:
+
+- Funcionamento da aplicação em container
+- Integração com banco de dados SQL Server
+- Execução correta das migrations
+- Exposição da API em ambiente real
+
+Após essa validação, a instância foi desligada propositalmente para controle de custos, mantendo o projeto reprodutível via Docker local.
+
+---
 ###  Endpoints principais
 
 Customers
-POST   /api/customers
-GET    /api/customers
-GET    /api/customers/{id}
+POST /api/customers
+GET /api/customers (paginado)
+GET /api/customers/{id}
 
 Products
-POST   /api/products
-GET    /api/products
-PATCH  /api/products/{id}/status
-PATCH  /api/products/{id}/stock
+POST /api/products
+GET /api/products (paginado)
+PATCH /api/products/{id}/status
+PATCH /api/products/{id}/stock
 
 Orders
-POST   /api/orders
-GET    /api/orders
-GET    /api/orders/{id}
-PATCH  /api/orders/{id}/status
+POST /api/orders
+GET /api/orders (paginado)
+GET /api/orders/{id}
+PATCH /api/orders/{id}/status
 
 ---
 
