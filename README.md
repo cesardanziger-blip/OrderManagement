@@ -417,6 +417,7 @@ dotnet test
 ### Infraestrutura
 - [x] Docker
 - [x] Tratamento global de exceções
+- [x] Deploy em ambiente AWS (EC2 + Docker Compose)
 
 ---
 
