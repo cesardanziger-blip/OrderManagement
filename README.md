@@ -28,7 +28,7 @@ A solução segue princípios de:
 - Clean Architecture
 - SOLID
 - Clean Code
-- 
+
 A solução foi organizada em camadas seguindo princípios de Clean Architecture e DDD:
 
 - API: camada de entrada da aplicação (Controllers e configuração do pipeline HTTP)
@@ -36,6 +36,7 @@ A solução foi organizada em camadas seguindo princípios de Clean Architecture
 - Domain: regras de negócio, entidades e interfaces do domínio
 - Infrastructure: persistência de dados, Entity Framework Core e repositórios
 - Tests: testes unitários focados em regras de negócio
+
 ---
 
 ### Regras de negócio principais
@@ -302,6 +303,30 @@ Disponível em:
 - [x] Docker
 - [x] Tratamento global de exceções
 
+---
+
+### Testes automatizados
+
+Foram implementados testes unitários com foco em regras de negócio críticas, totalizando **40 cenários validados**.
+
+**Estratégia adotada:**
+- Isolamento de dependências com Moq
+- Validação de comportamento do domínio
+- Cobertura dos fluxos mais sensíveis (estoque, pedidos e status)
+
+Os testes priorizam regras de negócio ao invés de cobertura completa de endpoints.
+
+**Trade-off:**
+- Não foi priorizada cobertura completa de toda a camada de aplicação e infraestrutura
+- Foco em consistência de regras críticas do domínio
+
+### Como executar os testes
+
+Na raiz do projeto:
+
+```bash
+dotnet test
+```
 ---
 ### Executar aplicação
 ### Pré-requisitos
