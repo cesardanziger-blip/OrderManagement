@@ -18,6 +18,7 @@ O projeto foi estruturado com foco em clareza de domínio, consistência de regr
 - xUnit (testes unitários)
 - Moq
 - FluentAssertions
+- Docker
 ---
 ## Arquitetura
 
@@ -298,7 +299,7 @@ Disponível em:
 - [x] Testes de regras de negócio (validação de comportamento do domínio)
 
 ### Infraestrutura
-- [ ] Docker
+- [x] Docker
 - [x] Tratamento global de exceções
 
 ---
