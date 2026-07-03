@@ -33,9 +33,9 @@ namespace OrderManagement.API.Controllers
         /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<ProductResponse>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<ProductResponse>>> GetAll()
+        public async Task<ActionResult<IEnumerable<ProductResponse>>> GetAll([FromQuery] PagedRequest request)
         {
-            var products = await _productService.GetAllAsync();
+            var products = await _productService.GetAllAsync(request);
 
             return Ok(products);
         }

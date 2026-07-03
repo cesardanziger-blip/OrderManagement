@@ -173,3 +173,48 @@ Benefícios:
 
 ## Controle de estoque
 O controle de estoque foi ajustado para tratar o valor informado como o estoque atual do produto, e não como uma variação incremental.
+
+## Estratégia de Paginação
+
+Foi adotada uma estratégia de paginação baseada em parâmetros de consulta (`pageNumber` e `pageSize`) para os endpoints de listagem de clientes, produtos e pedidos.
+
+Essa abordagem reduz a quantidade de dados retornados por requisição, melhora a escalabilidade da API e facilita a navegação por grandes volumes de informações.
+
+As respostas seguem um formato padronizado contendo:
+
+* Lista de itens da página atual (`items`);
+* Página atual (`pageNumber`);
+* Quantidade de itens por página (`pageSize`);
+* Total de registros (`totalCount`);
+* Total de páginas (`totalPages`);
+* Indicadores de navegação (`hasNext` e `hasPrevious`).
+
+A paginação é aplicada na camada de aplicação, utilizando `Skip` e `Take` sobre a consulta retornada pelo repositório, mantendo a separação de responsabilidades e um contrato de resposta consistente entre os endpoints.
+
+---
+
+## Estratégia de Testes Automatizados
+
+Os testes automatizados foram implementados priorizando as principais regras de negócio da aplicação, com foco na validação do comportamento do domínio e dos serviços de aplicação.
+
+### Ferramentas utilizadas
+
+* **xUnit**: framework principal para execução dos testes unitários.
+* **Moq**: utilizado para simular dependências externas, como repositórios e Unit of Work, permitindo o teste isolado dos serviços.
+* **FluentAssertions**: utilizado para tornar as asserções mais legíveis e expressivas, facilitando a manutenção dos testes.
+* **Coverlet**: utilizado para geração de métricas de cobertura de código.
+
+### Estratégia adotada
+
+Foram priorizados testes unitários que validam as regras de negócio consideradas mais críticas para a aplicação, incluindo:
+
+* Criação de pedidos;
+* Validação de estoque disponível;
+* Consistência da baixa de estoque em pedidos com múltiplos itens;
+* Retorno de estoque em cancelamentos permitidos;
+* Validação de clientes ativos e inativos;
+* Validação de produtos ativos e inativos;
+* Fluxo de transição de status dos pedidos;
+* Registro do histórico de alterações de status.
+
+A estratégia prioriza o isolamento das dependências por meio de mocks, garantindo que cada teste valide apenas a lógica da unidade sob teste. A cobertura não contempla todos os endpoints da API, concentrando-se nas regras de negócio de maior impacto e risco.

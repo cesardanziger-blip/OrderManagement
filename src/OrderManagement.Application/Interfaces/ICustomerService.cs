@@ -6,7 +6,7 @@ namespace OrderManagement.Application.Interfaces
     public interface ICustomerService
     {
         Task<CustomerResponse> CreateAsync(CreateCustomerRequest customer);
-        Task<List<CustomerResponse>> GetAllAsync();
+        Task<PagedResponse<CustomerResponse>> GetAllAsync(PagedRequest request);
         Task<CustomerResponse> GetByIdAsync(Guid id);
 
         Task UpdateStatusAsync(Guid id, UpdateCustomerStatusRequest request);

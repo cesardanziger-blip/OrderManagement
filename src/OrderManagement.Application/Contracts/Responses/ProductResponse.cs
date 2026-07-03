@@ -10,7 +10,7 @@ namespace OrderManagement.Application.Contracts.Responses
         public decimal Price { get; set; }
         public int Stock { get; set; }
         public ProductStatus Status { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
     }
 }

@@ -28,11 +28,25 @@ namespace OrderManagement.Application.Services
             return product.ToResponse();
         }
 
-        public async Task<List<ProductResponse>> GetAllAsync()
+        public async Task<PagedResponse<ProductResponse>> GetAllAsync(PagedRequest request)
         {
-            var products = await _productRepository.GetAllAsync();
+            var query = await _productRepository.GetAllAsync();
 
-            return products.Select(c => c.ToResponse()).ToList();
+            var totalCount = query.Count();
+
+            var items = query
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .Select(o => o.ToResponse())
+                .ToList();
+
+            return new PagedResponse<ProductResponse>
+            {
+                Items = items,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                TotalCount = totalCount
+            };
         }
 
         public async Task<ProductResponse> GetByIdAsync(Guid id)

@@ -1,276 +1,327 @@
-📦 Order Management API
+# Order Management API
 
-API REST desenvolvida em .NET 10 para gerenciamento de clientes, produtos, estoque e pedidos.
+> Projeto desenvolvido para fins de avaliação técnica, seguindo as especificações fornecidas no desafio.
 
-Este projeto foi construído como desafio técnico, aplicando Clean Architecture, DDD e boas práticas de backend, com foco em regras de negócio consistentes, separação de responsabilidades e testabilidade.
+API REST desenvolvida em .NET 10 para gerenciamento de clientes, produtos, estoque e pedidos, aplicando princípios de Clean Architecture, DDD (Domain-Driven Design) e boas práticas de desenvolvimento backend.
+O projeto foi estruturado com foco em clareza de domínio, consistência de regras de negócio e separação de responsabilidades.
 
-🚀 Visão geral
+---
 
-A API permite:
+## Tecnologias
 
-Gestão de clientes e produtos
-Controle de estoque
-Criação e gerenciamento de pedidos
-Controle de status de pedidos com regras de transição
-Auditoria completa de alterações (histórico)
-Validações de regras de negócio no domínio
-Persistência em banco relacional
-🧱 Tecnologias
-.NET 10
-ASP.NET Core Web API
-Entity Framework Core
-SQL Server
-FluentValidation
-Swagger / OpenAPI
-xUnit
-Moq
-FluentAssertions
-🏗️ Arquitetura
+- .NET 10
+- ASP.NET Core Web API
+- Entity Framework Core
+- SQL Server
+- FluentValidation
+- Swagger / OpenAPI
+- xUnit (testes unitários)
+- Moq
+- FluentAssertions
+---
+## Arquitetura
 
-O projeto segue Clean Architecture + DDD, dividido em:
+A solução segue princípios de:
 
-Domain → regras de negócio e entidades
-Application → casos de uso (services)
-Infrastructure → persistência e EF Core
-API → endpoints HTTP
+- Domain (regras de negócio)
+- Clean Architecture
+- SOLID
+- Clean Code
+- 
+A solução foi organizada em camadas seguindo princípios de Clean Architecture e DDD:
 
-Essa separação garante:
+- API: camada de entrada da aplicação (Controllers e configuração do pipeline HTTP)
+- Application: casos de uso, serviços, contratos e validações
+- Domain: regras de negócio, entidades e interfaces do domínio
+- Infrastructure: persistência de dados, Entity Framework Core e repositórios
+- Tests: testes unitários focados em regras de negócio
+---
 
-isolamento de regras de negócio
-alta testabilidade
-baixo acoplamento
-facilidade de manutenção
-📁 Estrutura do projeto
-src
-├── OrderManagement.API
-│   ├── Controllers
-│   └── Program.cs
-│
-├── OrderManagement.Application
-│   ├── Contracts
-│   ├── Services
-│   ├── Interfaces
-│   ├── Mappings
-│   └── Validators
-│
-├── OrderManagement.Domain
-│   ├── Entities
-│   ├── Enums
-│   └── Interfaces
-│
-└── OrderManagement.Infrastructure
-    ├── Context
-    ├── Repositories
-    ├── Configurations
-    └── Migrations
+### Regras de negócio principais
+Clientes inativos não podem criar pedidos
+Produtos inativos não podem ser utilizados
+Estoque é validado e atualizado no momento do pedido
+Status de pedido segue fluxo controlado
+Histórico de alterações é obrigatório
 
-tests
-└── OrderManagement.UnitTests
-📌 Principais decisões técnicas
-✔ Contracts ao invés de DTOs
+---
+### Fluxo de pedidos
+O sistema implementa um fluxo controlado de status de pedidos:
 
-Separação clara entre entrada/saída da API sem acoplamento ao domínio.
+Fluxo de pedidos:
+- Created → Paid → Shipped
+- Created → Cancelled
 
-✔ Domínio rico
-
-Regras de negócio são centralizadas nas entidades, evitando “anemic domain model”.
-
-✔ Controle de estoque no domínio
-
-Estoque é validado e atualizado durante criação de pedidos.
-
-✔ Decimal para valores monetários
-
-Evita problemas de precisão de ponto flutuante.
-
-✔ Datas em UTC
-
-Todas as datas são persistidas em UTC (DateTime.UtcNow).
-
-A conversão para o fuso America/Sao_Paulo deve ser feita na camada de apresentação.
-
-✔ Enumerações
-
-Usadas para controle de estado de:
-
-Cliente
-Produto
-Pedido
-🔄 Fluxo de pedidos
-Status suportados:
-Created
-Paid
-Shipped
-Cancelled
 Regras:
-Created → Paid
-Paid → Shipped
-Created → Cancelled
-Restrições:
-Pedido enviado não pode ser cancelado
-Pedido cancelado não pode ser alterado
 Transições inválidas são bloqueadas no domínio
-📜 Histórico de pedidos
+Histórico completo de mudanças é registrado via OrderHistory
+Status controlado exclusivamente pela entidade Order
 
-O sistema mantém auditoria completa de mudanças de status.
+---
+### Histórico de pedidos
 
-Cada alteração registra:
+O sistema mantém auditoria completa de alterações de status.
 
+Registro criado automaticamente no momento da criação do pedido
+Histórico inclui:
 Status anterior
 Novo status
-Data/hora (UTC)
-Motivo (opcional)
-📡 Endpoints
+Data da alteração
+Motivo (quando aplicável)
+
+---
+
+### Controle de estoque
+
+O controle de estoque é feito diretamente na camada de aplicação/domínio durante a criação de pedidos.
+
+Garantias:
+- Validação de estoque antes da criação do pedido
+- Baixa de estoque apenas após validação de todos os itens
+- Cancelamento retorna estoque apenas se permitido pelas regras de negócio
+
+Trade-off:
+- Não foi implementado controle de concorrência otimista (RowVersion)
+- Em cenários reais de alta concorrência, isso seria necessário para evitar race conditions
+
+---
+## Principais decisões técnicas
+
+- Uso de Contracts ao invés de DTOs para separar claramente as camadas de entrada e saída da API
+- Domínio isolado de frameworks externos, mantendo regras de negócio independentes da infraestrutura
+- Regras de negócio centralizadas nas entidades, seguindo princípios de Domain-Driven Design (DDD)
+- Controle de estoque realizado dentro do domínio durante o fluxo de criação e cancelamento de pedidos
+- Uso do tipo decimal para representar valores monetários com precisão
+- Datas armazenadas em UTC (DateTime.UtcNow) para garantir consistência temporal
+- Uso de enums para controle de estado (Customer, Product e Order), reduzindo estados inválidos
+
+---
+###  Endpoints principais
+
 Customers
 POST /api/customers
-GET /api/customers
+GET /api/customers (paginado)
 GET /api/customers/{id}
-PATCH /api/customers/{id}/status
+
 Products
 POST /api/products
-GET /api/products
-GET /api/products/{id}
-PUT /api/products/{id}
+GET /api/products (paginado)
 PATCH /api/products/{id}/status
 PATCH /api/products/{id}/stock
+
 Orders
 POST /api/orders
-GET /api/orders
+GET /api/orders (paginado)
 GET /api/orders/{id}
 PATCH /api/orders/{id}/status
-📄 Regras de negócio principais
-Clientes inativos não podem criar pedidos
-Produtos inativos não podem ser usados em pedidos
-Estoque não pode ser negativo
-Pedido deve conter pelo menos um item
-Estoque é validado antes da criação do pedido
-Estoque é debitado na criação do pedido
-Cancelamento retorna estoque (se permitido)
-Preço do item é fixado no momento da compra
-📊 Paginação
 
-Endpoints de listagem não possuem paginação implementada no momento.
+---
 
-Justificativa:
+### Validação
 
-A implementação foi simplificada para foco nas regras de domínio e fluxo de pedidos.
+O projeto utiliza FluentValidation na camada de Application.
 
-Evolução futura:
+Responsabilidades:
+- Validação de entrada (requests)
+- Regras de formato e consistência
+- Validações assíncronas (ex: unicidade de email/documento)
 
-Em um cenário de produção seria aplicada:
+Separação de responsabilidades:
+- FluentValidation → validação de entrada
+- Domain → regras de negócio
 
-PageNumber
-PageSize
-Skip / Take
-TotalCount
-⚔️ Concorrência de estoque
+Regras:
+- Transições inválidas são bloqueadas no domínio
+- Histórico completo de mudanças é registrado via OrderHistory
+- Status controlado exclusivamente pela entidade Order
 
-Atualmente, a aplicação não implementa controle de concorrência otimista (RowVersion).
+---
+### Persistência de dados
 
-Comportamento atual:
-Validação de estoque ocorre antes da baixa
-Operações são feitas via Unit of Work (transação lógica)
-Limitação:
+Foi utilizado Entity Framework Core com SQL Server como ORM e banco relacional.
 
-Em cenários de alta concorrência pode ocorrer race condition.
+Trade-off:
+- EF Core facilita produtividade e abstração de queries
+- Em contrapartida, pode esconder complexidade de queries mais críticas
 
-Evolução recomendada:
-RowVersion (EF Core concurrency token)
-Lock otimista/pessimista no banco
-ou isolamento transacional mais forte
-💰 Valores monetários
+A escolha foi feita visando produtividade e aderência ao escopo do desafio.
 
-Valores financeiros são representados com decimal para garantir precisão e evitar erros de arredondamento.
+---
 
-🕒 Datas e fuso horário
-Persistência em UTC
-Uso de DateTime.UtcNow
-Conversão para America/Sao_Paulo na camada de apresentação
-🧪 Testes
+### Consistência transacional
 
-O projeto utiliza:
+A consistência entre criação de pedido e atualização de estoque é garantida pelo uso de Unit of Work.
 
-xUnit (framework)
-Moq (mock de dependências)
-FluentAssertions (assertividade)
-Estrutura
-Application
-Orders
-Products
-Customers
-O que é testado
-Criação de pedidos
-Validação de estoque
-Regras de clientes e produtos ativos/inativos
-Fluxo de status
-Cancelamento de pedidos
-Consistência de estoque
-Histórico de pedidos
-Estratégia
-Testes focados em regras de negócio
-Isolamento com mocks
-Validação de comportamento (não implementação)
-Execução
-dotnet test
-Observação
+Isso garante que:
+- Ou todas as operações são persistidas
+- Ou nenhuma alteração é aplicada
 
-Nem todos os endpoints possuem cobertura completa, pois o foco está nas regras críticas de domínio.
+---
 
-🧩 Swagger
+### Valores monetários
 
-A API possui documentação via Swagger/OpenAPI com:
+Valores financeiros são representados utilizando decimal, garantindo precisão e evitando problemas de arredondamento comuns com tipos de ponto flutuante.
 
-schemas tipados
-endpoints testáveis
-respostas HTTP documentadas
+---
+
+### Datas e fuso horário
+
+As datas são armazenadas em UTC (DateTime.UtcNow) para garantir consistência no banco de dados.
+
+A interpretação para o fuso America/Sao_Paulo deve ser feita na camada de apresentação.
+
+---
+
+### Extensões e configuração global
+
+O projeto utiliza extension methods para centralizar a configuração da aplicação, reduzindo acoplamento no Program.cs.
+
+Exemplos:
+- Configuração de dependências por camada (Application / Infrastructure)
+- Registro de serviços e repositórios via métodos de extensão
+- Middleware global de tratamento de exceções
+
+Essa abordagem mantém o Program.cs limpo e melhora a organização da inicialização da aplicação.
+
+---
+
+### Testes automatizados
+
+Foram implementados testes unitários com foco em regras de negócio críticas, totalizando 40 cenários validados.
+
+Estratégia adotada:
+- Isolamento de dependências com Moq
+- Validação de comportamento do domínio
+- Cobertura dos fluxos mais sensíveis (estoque, pedidos e status)
+
+Os testes priorizam regras de negócio ao invés de cobertura completa de endpoints.
+
+Trade-off:
+- Não foi priorizada cobertura completa de toda a camada de aplicação e infraestrutura
+- Foco em consistência de regras críticas do domínio
+
+---
+
+### Paginação
+
+Todos os endpoints de listagem (Customers, Products e Orders) possuem suporte a paginação.
+
+A paginação foi implementada utilizando os parâmetros:
+
+- PageNumber (padrão: 1)
+- PageSize (padrão: 10)
+
+A resposta segue um padrão estruturado contendo:
+
+- Itens da página atual
+- Total de registros
+- Página atual
+- Tamanho da página
+- Informações auxiliares (TotalPages, HasNext, HasPrevious)
+
+Exemplo de uso:
+
+GET /api/orders?pageNumber=1&pageSize=10
+
+Estratégia adotada:
+
+- Uso de Skip e Take no Entity Framework Core
+- Cálculo de total de registros para controle de paginação
+- Estrutura de resposta padronizada para reutilização em diferentes entidades
+
+Essa abordagem garante melhor performance em listagens e evita carregamento completo de dados em memória.
+
+## Requisitos não funcionais
+
+- Uso de EF Core como ORM principal
+- Uso de SQL Server como banco relacional
+- Arquitetura em camadas para separação de responsabilidades
+- Uso de decimal para precisão financeira
+- Uso de UTC para padronização de datas
+
+---
+### Swagger / Documentação
+
+A API é documentada com Swagger/OpenAPI.
+
+Funcionalidades:
+- Documentação automática dos endpoints
+- Testes via interface interativa
+- Definição explícita de status HTTP
+- Schema de requests e responses claramente tipados
 
 Disponível em:
-
 /swagger
-📌 Requisitos não funcionais
-.NET 10
-API REST
-EF Core + SQL Server
-Validações com FluentValidation
-Arquitetura em camadas
-Uso de UTC
-Uso de decimal para dinheiro
-Testes automatizados
-📈 Roadmap
-Concluído
-Arquitetura base
-Domínio e regras de negócio
-EF Core + migrations
-API completa
-Testes unitários
-Swagger
-Tratamento global de exceções
-Futuro
-Docker
-Paginação completa
-Concorrência otimista (RowVersion)
-Melhorias de performance em queries
-🧠 Decisões técnicas e trade-offs
-EF Core
 
-Escolhido por produtividade e integração com .NET.
+---
+## Destaques Técnicos
 
-Unit of Work
+- Modelo de domínio rico com regras de negócio encapsuladas nas entidades
+- Controle de estoque garantido durante criação de pedidos
+- Fluxo de status de pedidos com regras de transição controladas no domínio
+- Histórico completo de alterações de status para auditoria
+- Separação clara entre validação de entrada (FluentValidation) e regras de negócio (Domain)
 
-Garantia de consistência transacional.
+---
+## Roadmap
 
-Sem concorrência otimista
+### Estrutura inicial
+- [x] Estrutura da solução
+- [x] Configuração da arquitetura
+- [x] Configuração do Entity Framework Core
 
-Trade-off de simplicidade vs robustez em alta carga.
+### Domínio
+- [x] Modelagem das entidades
+- [x] Implementação das regras de negócio
+- [x] Implementação do fluxo de status dos pedidos
 
-Sem paginação
+### Persistência
+- [x] Configuração das entidades (EF Core)
+- [x] Repositórios
+- [x] Migrations
 
-Foco em domínio e regras do negócio.
+### Aplicação
+- [x] Casos de uso
+- [x] Mapeamentos
+- [x] Contracts (Requests e Responses)
+- [x] Services
+- [x] Validações com FluentValidation
 
-Testes focados em regras
+### API
+- [x] Endpoints de clientes
+- [x] Endpoints de produtos
+- [x] Endpoints de pedidos
+- [x] Swagger
 
-Cobertura prioriza regras críticas ao invés de endpoints.
+### Testes
+- [x] Testes unitários (isolamento de serviços e validação de regras individuais)
+- [x] Testes de regras de negócio (validação de comportamento do domínio)
 
-👤 Autor
+### Infraestrutura
+- [ ] Docker
+- [x] Tratamento global de exceções
 
+---
+### Pré-requisitos
+- .NET 10 SDK
+- SQL Server
+---
+### Executar aplicação
+---
+```bash
+dotnet restore
+dotnet build
+dotnet run --project src/OrderManagement.API
+```
+---
+### Observação final
+Este projeto foi desenvolvido com foco em:
+
+- Clareza de domínio
+- Boas práticas de arquitetura
+- Simplicidade com consistência
+- Facilidade de manutenção e evolução
+
+---
+## Autor
 Cesar Danziger

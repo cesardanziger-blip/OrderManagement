@@ -86,11 +86,25 @@ namespace OrderManagement.Application.Services
             return order.ToResponse();
         }
 
-        public async Task<List<OrderResponse>> GetAllAsync()
+        public async Task<PagedResponse<OrderResponse>> GetAllAsync(PagedRequest request)
         {
-            var orders = await _orderRepository.GetAllAsync();
+            var query = await _orderRepository.GetAllAsync();
 
-            return orders.Select(c => c.ToResponse()).ToList();
+            var totalCount = query.Count();
+
+            var items = query
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .Select(o => o.ToResponse())
+                .ToList();
+
+            return new PagedResponse<OrderResponse>
+            {
+                Items = items,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                TotalCount = totalCount
+            };
         }
 
         public async Task UpdateStatusAsync(Guid id, UpdateOrderStatusRequest request)

@@ -1,6 +1,5 @@
 ﻿using OrderManagement.Application.Contracts.Requests;
 using OrderManagement.Application.Contracts.Responses;
-using OrderManagement.Application.Mappings.Extensions;
 using OrderManagement.Domain.Entities;
 
 namespace OrderManagement.Application.Mappings
@@ -16,8 +15,8 @@ namespace OrderManagement.Application.Mappings
                 Email = customer.Email,
                 Document = customer.Document,
                 Status = customer.Status,
-                CreatedAt = customer.CreatedAt.ToSaoPaulo(),
-                UpdatedAt = customer.UpdatedAt?.ToSaoPaulo()
+                CreatedAt = customer.CreatedAt,
+                UpdatedAt = customer.UpdatedAt
             };
         }
 

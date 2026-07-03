@@ -49,9 +49,9 @@ namespace OrderManagement.API.Controllers
         /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(List<CustomerResponse>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<CustomerResponse>>> GetAll()
+        public async Task<ActionResult<List<CustomerResponse>>> GetAll([FromQuery] PagedRequest request)
         {
-            var customers = await _customerService.GetAllAsync();
+            var customers = await _customerService.GetAllAsync(request);
             return Ok(customers);
         }
 

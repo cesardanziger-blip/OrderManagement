@@ -1,4 +1,5 @@
 ﻿using OrderManagement.Application.Contracts.Responses;
+using OrderManagement.Application.Mappings.Extensions;
 using OrderManagement.Domain.Entities;
 
 namespace OrderManagement.Application.Mappings

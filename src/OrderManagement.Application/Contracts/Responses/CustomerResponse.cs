@@ -9,7 +9,7 @@ namespace OrderManagement.Application.Contracts.Responses
         public string Email { get; set; } = String.Empty;
         public string Document { get; set; } = String.Empty;
         public CustomerStatus Status { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
     }
 }
