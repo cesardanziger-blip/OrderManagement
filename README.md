@@ -21,17 +21,33 @@ O projeto foi estruturado com foco em clareza de domínio, consistência de regr
 - Docker
 
 ---
+## Executar aplicação
 
-### Executar aplicação
 ### Pré-requisitos
-- .NET 10 SDK
-- SQL Server
+
+* .NET 10 SDK
+* SQL Server
+
+### Iniciar a aplicação
+
+Na raiz do projeto, execute:
 
 ```bash
 dotnet restore
 dotnet build
 dotnet run --project src/OrderManagement.API
 ```
+
+Após a inicialização, a API estará disponível em:
+
+**API / Swagger**
+
+```
+http://localhost:5174/swagger
+```
+
+> **Observação:** a porta (`5174`) corresponde à configuração padrão do projeto. Caso ela seja alterada no arquivo `launchSettings.json` ou por variáveis de ambiente, a URL poderá ser diferente.
+
 ---
 
 ## Executando com Docker
