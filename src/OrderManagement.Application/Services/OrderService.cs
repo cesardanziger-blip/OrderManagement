@@ -34,16 +34,17 @@ namespace OrderManagement.Application.Services
 
         public async Task<OrderResponse> CreateAsync(CreateOrderRequest request)
         {
-            var customerId = request.CustomerId;
-
-            var customer = await _customerRepository.GetByIdAsync(customerId)
-                ?? throw new CustomerNotFoundException(customerId);
+            var customer = await _customerRepository.GetByIdAsync(request.CustomerId)
+                ?? throw new CustomerNotFoundException(request.CustomerId);
 
             if (customer.Status != CustomerStatus.Active)
-                throw new InactiveCustomerException(customerId);
+                throw new InactiveCustomerException(request.CustomerId);
 
-            var order = new Order(customerId);
+            var order = new Order(customer.Id);
 
+            var products = new Dictionary<Guid, Product>();
+
+            //Validar
             foreach (var item in request.Items)
             {
                 var product = await _productRepository.GetByIdAsync(item.ProductId)
@@ -53,13 +54,19 @@ namespace OrderManagement.Application.Services
                     throw new InactiveProductException(item.ProductId);
 
                 if (product.Stock < item.Quantity)
-                    throw new InsufficientStockException(product.Id,product.Name);
+                    throw new InsufficientStockException(product.Id, product.Name);
 
-                product.DecreaseStock(item.Quantity);
-
-                order.AddItem(product, item.Quantity);
+                products[item.ProductId] = product;
             }
 
+            //Aplicar
+            foreach (var item in request.Items)
+            {
+                var product = products[item.ProductId];
+
+                product.DecreaseStock(item.Quantity);
+                order.AddItem(product, item.Quantity);
+            }
             await _orderRepository.CreateAsync(order);
 
             await _orderHistoryRepository.AddAsync(
@@ -108,18 +115,18 @@ namespace OrderManagement.Application.Services
 
                 case OrderStatus.Cancelled:
                     {
-                        order.MarkAsCancelled(request.Reason);
-
                         if (previousStatus == OrderStatus.Shipped)
                             throw new InvalidOperationException("Shipped orders cannot be cancelled.");
 
-                            foreach (var item in order.Items)
-                            {
-                                var product = await _productRepository.GetByIdAsync(item.ProductId)
-                                    ?? throw new ProductNotFoundException(item.ProductId);
+                        order.MarkAsCancelled(request.Reason);
 
-                                product.IncreaseStock(item.Quantity);
-                            }
+                        foreach (var item in order.Items)
+                        {
+                            var product = await _productRepository.GetByIdAsync(item.ProductId)
+                                ?? throw new ProductNotFoundException(item.ProductId);
+
+                            product.IncreaseStock(item.Quantity);
+                        }
 
                         break;
                     }

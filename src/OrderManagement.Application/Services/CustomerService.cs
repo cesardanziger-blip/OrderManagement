@@ -46,7 +46,7 @@ namespace OrderManagement.Application.Services
             var customer = await _customerRepository.GetByIdAsync(id)
                 ?? throw new CustomerNotFoundException(id);
 
-            return customer?.ToResponse();
+            return customer.ToResponse();
         }
 
         public async Task UpdateStatusAsync(Guid id, UpdateCustomerStatusRequest request)
